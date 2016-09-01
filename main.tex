@@ -5,6 +5,40 @@
 \usepackage{caption}
 % Some very useful LaTeX packages include:
 % (uncomment the ones you want to load)
+%----------------------------------------------------------------------------------------
+%	LISTINGS
+%----------------------------------------------------------------------------------------
+\usepackage{listings}
+\lstset{language=C}
+\lstset{
+  basicstyle=\footnotesize\ttfamily,
+  breaklines=true,
+  showstringspaces=false,
+  numbers=left,
+  backgroundcolor=\color{bgcolor},
+  commentstyle=\color{gray},
+  keywordstyle=\color{blue},
+  keywordstyle=[2]\color{teal},   % cyan or teal can also be a good choice, use \bfseries for bold
+  frame=none,                     % adds a frame around the code
+  tabsize=2,                      % sets default tabsize to 2 spaces
+  captionpos=b,                   % sets the caption-position to bottom
+  morekeywords=[2]{}              % if you want to add more keywords to the set
+    __
+}
+
+\usepackage{color}
+\definecolor{bgcolor}{rgb}{0.98,0.98,0.98}
+
+
+%----------------------------------------------------------------------------------------
+%	ALGORITHM
+%----------------------------------------------------------------------------------------
+\usepackage[]{algorithm2e}
+
+
+\usepackage{mdframed,framed}
+
+\SetKwProg{Fn}{Procedure}{}{}
 
 
 % *** MISC UTILITY PACKAGES ***
@@ -318,7 +352,8 @@ Email: mailalice}
 \maketitle
 
 
-\begin{abstrct}
+\begin{abstract}
+
 \end{abstract}
 
 % Note that keywords are not normally used for peerreview papers.
@@ -344,21 +379,74 @@ IEEEtran, journal, \LaTeX, paper, template.
 
 
 \section{Introduction}
+Why tracking from images is important. Explain that several experimental research areas relies on images as method fot getting data especially in biology and biomedical areas where cells motion properties over time are very important for several applications, such as tumoral metastatis and bacterical invasion.
+The researcher usually rely on manual o semi-manual/interactive software to study such properties. This approach is unfeasible when the number of cells involved in the analysis is high. atutomatic tracking is necessary and crucial.
+
+Object of sthis work is to show how tracca succesfully allows tracking of partciles from ND images is possible using XCA as general framweork for image manipulation.
+The approach used here is to use perform tracking using edge informations to segment the objects and track down the change in topology/shape and position over time. 
+
+
+
+
 1. problem statement
 2. lavori esistenti
 3. contributo di questo lavoro
 
+
+
+
 \section{Complex Cellular Automata}
 \input{CA.tex}
-\section{Tracking Framework}
-\subsection{Preprocessing}
-\subsection{Segmentation}
-\subsection{Tracking}
+
+
 
 \section{Bacteria Tracking}
+The E. coli cells typically have a large range of motion patterns
+and the cell soma generally appears as a dark area surrounded
+with a white halo. But the contrast can be inverted
+and the cell may appear white when it has moved sufficiently
+out of focus (see Fig. 1). In order to automatically detect coli
+cells in each frame, one can use a histogram-based thresholding
+method as suggested in \cite{threshold} (S. Cho, R. Haralick, and S. Yi, “Improvement of Kittler and Illingworth’s minimum error thresholding,” Pattern Recognit., vol. 22, no. 5, pp. 609– 617, 1989)
 
+\subsection{Input Data}
+che tipo di dati abbiamo in input (immagini, formati, dimensioni, numero, che dimensioni totali in termini di bytes vengono processati?). Come le abbiamo ottenute (specifiche microscopio e tutto quello che è rilevante)
+Che modello di colori viene tutilizzato?
+
+\begin{framed}
+We used B.subtilis strain OI1085 for the tracking experiment. Cells were taken from frozen stock, resuspended in CAM (Cap Assay Minimal) and shaken  (37 °C, 100 rpm) until the optical density OD600=0.3 was reached; we then diluted the suspension 1:10 in CAM. The bacterial suspension was injected in a microfluidic device. The microfluidic device is a simple device made by PDMS and glass, composed by three parallel channels (height 100 um). In the central channel (600 um wide) bacteria were hosted and observed. Two  walls of PDMS (200 um) separate the central channel to the left and right channels were oxygen was flown in order to reach a concentration of oxygen closed to 100\% in the central channel. 10 minutes after the injection of bacterial suspension a video was acquired at 100 frames per second for 41 second (4100 frames). All images were acquired through a 10× objective (Nikon microscope), Phase Contrast, using binning 2X2.
+
+\end{framed}
+
+\subsection{Bacteria Segmentation}
+Come prima step per il tracking i batteri vanno prima individuati. Il processo di individuazione si chiama segmentazione. La stragia utilizzata è quella della soglia. metodologia scelta perchè le immagini dal microscopio presentano un forte contrasto tra lo sfondo e i cluster di pixel che rappresentano i batteri. (mostra piccola immagine se serve). 
+Tutti i filtri che sono applicati alle immagini sono implementati in una libreria c++11 utilizzando il paradigma degli automi cellulari. Ogni immagine è rappresentata da un modello bidimensionale 
+\begin{lstlisting}[language=c++]
+opencal::CALSubstate<vec1s, 2, COORD_TYPE>
+opencal::CALModel<2, opencal::CALMooreNeighborhood<2,MOORERADIUS>, COORD_TYPE>;
+\end{lstlisting}
+ in cui l'unico sottostato contiene le informazioni per ogni pixel (che nelle immagini che abbiamo sono codificate in uno unsigned short) ed un vicinato di \textbf{Moore}(vedi paragrafo automi cellulari).
+Nello specifico primo di appkicare il filtro di threshold, il contrasto delle immagini viene migliorato attravero l'applicazione di un filtro di Contrast Stretching che restringe il range dell'intensità di colore di ogni  pixel (spiega come funziona questo filtro in due parole mostrando la trasformazione a cui vengono sottoposti tutti i pixel con la formula).
+Questa fase può essere accampagnata da un ulteriore applicazione di una  serie di filtri atti a diminuire il rumore di fondo (causato da abberazioni del vetrino per esempio) come il Filtro Gaussiano \footnote{Che banana è il filtro gaussiano?}. I batteri vengono segmentati applicando un filtro di threshold trasformando l'immagine in binaria, i cui pixel "colorati" sono quelli la cui intensità di colore rientra nel range passato al filtro. Questo range deve essere trovato precedentemente e è strettamente dipendente dal set di immagini che si stanno analizzando in quando è fortemente condizionato dai parametri ottici dello strumento utilizzato (obiettivo, tempo di esposizione, etc.)
+
+ Una volta segmentati  i batteri, per ognuno di essi bisogna calcolarne le informazioni che li identificano univocamente e spazialmente. Abbiamo scelto di utilizzare un poligono (la libreria geometrica usata è CGAL \textbf{(metti riferimento a CGAL importante)}versione random) i cui lati approssimano i contorni del batterio e il relativo centroide ed un ID  univoco che consiste in un intero progressivo. \tefxtbf{Qui ci sta bene un immagine di un batterio segmentato con disegnato il poligono! (Grazie Paola)}
+ Tutti batteri segmentati vengono poi filtrati in base a un criterio di conformità che dipende dalle dimensioni del poligono (eliminiamo pixel di dimensione troppo piccola, che magari sono solo rumore residuo o batteri molto fuori fuoco). se l'immagine è interpretata come un grafo allora ogni pixel attivo è un nodo, e  un arco esiste tra due nodi se e solo se le coordinate del nodo differiscono di uno(sono vicini secondo il vicinato di moore). Per ogni componente connessa di questo grafo viene avviata una visita per profondita, ed a tutti i piixel della componente connessa in esame viene asegnato lo stesso ID univoco. (vedi se è il caso di metter una msatrice sintetica di esempio)
+
+Prossima fase è l'individuazione dei batteri a partire dall'immagine binaria. Ogni batterio segmentato viene assegnato un ID univoco all'interno dell'immagine e viene descritto tramite un centroide e un poligono che ne descrive la forma(spiega che libreria viene utilizzata CGAL, in che versione)
+Quanti batteri mediamente ci sono? 
+
+
+spiega che i batteri si muovo in unoi spazio 3d e che il fuoco del microscopio è molto stretto (servono dati sul fuoco del microscopio) e che una volta che i batteri nuotano in direzione Y scompaiono dalle immagini. 
+Se una particella(cosi vengono chiamte nella descrizione dell'algoritmo al capitolo precedente) è "scompars" per un certo numero di frames, fino a quando la consideriamo candidabile per un eventuale match?
+
+Durante la validazione dei risultati è importante dire che i primi test sono stati effettuati utilizzando immagini  sintetiche di cluster non omogenei di pixel colorati su sfondo nero e fatti muovere secondo un certo movimento  (inventatene uno figo, circolare, pseudorandom blabla). 
+Mostra qualche risultato, ad esempio la velocità di movimento matcha. 
+\subsection{Tracking}
+In questa sezione bisogna specificare tutte le "funzioni" dell'algoritmo di tracking che sono state overriddate e "tunate" per questo specifico problema. Per esempio che funzione di distanza è stata utilizzata (mi pare che utilizziamo la similiarità dei poligono, e la distanza in una media pesata, ricorda di mettere i valori dei parametri che empiricamente hanno mostrato i migliori risultati)?
+Cosa sputa fuori in output?  
 
 \section{Conclusion}
+Come è stato validato il modello? (dovrebbe scriverlo alice)
 
     \begin{figure}
       \begin{center}
