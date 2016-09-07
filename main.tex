@@ -10,26 +10,7 @@
 %----------------------------------------------------------------------------------------
 %	LISTINGS
 %----------------------------------------------------------------------------------------
-\usepackage{listings}
-\lstset{language=C}
-\lstset{
-  basicstyle=\footnotesize\ttfamily,
-  breaklines=true,
-  showstringspaces=false,
-  numbers=left,
-  backgroundcolor=\color{bgcolor},
-  commentstyle=\color{gray},
-  keywordstyle=\color{blue},
-  keywordstyle=[2]\color{teal},   % cyan or teal can also be a good choice, use \bfseries for bold
-  frame=none,                     % adds a frame around the code
-  tabsize=2,                      % sets default tabsize to 2 spaces
-  captionpos=b,                   % sets the caption-position to bottom
-  morekeywords=[2]{}              % if you want to add more keywords to the set
-    __
-}
-
-\usepackage{color}
-\definecolor{bgcolor}{rgb}{0.98,0.98,0.98}
+\input{listings.tex}
 
 
 %----------------------------------------------------------------------------------------
@@ -391,7 +372,7 @@ uli
 \section{Introduction}
 Particle tracking plays an important role in numerous field of science for the investigating the movement of sub-micron particles, micropsheres and mulocules under microscopic observation.  Several researches employes time-lapse microscopy, especially in the field of biophysics, as a tool to gather data and retrieve single particle time tracjetories. The researcher usually rely on manual o semi-manual/interactive software to study such properties. This approach is unfeasible when the number of cells involved in the analysis is high.
 
-In this paper we present an algorithm for detecting and tracking particles that is based on image processing technique to performs segmentation and to a shape difference and centroid displacement analysis to reconstruct the trajectories. This method works for n-dimensional input images using XCA as a framework for image manipulation.
+In this paper we present an algorithm for detecting and tracking particles that is based on image processing technique to performs segmentation and to a shape difference and centroid displacement analysis to reconstruct the trajectories. This method works for $n$-dimensional input images using XCA as a framework for image manipulation.
 
 
 
@@ -407,13 +388,49 @@ In this paper we present an algorithm for detecting and tracking particles that 
 \input{CA.tex}
 
 
-\section{Manipulating images using XCA}
 
-\section{Bacteria Tracking}
+\section{Motility analysis of E.Coli}
+Qual è lo scopo di quest'applicazione?
+\subsection{Introduction}
+
+
+
 In this section we present an application of TraCCa to the analysis of motion of E. coli.
-We used B.subtilis strain OI1085 for the tracking experiment. Cells were taken from frozen stock, resuspended in CAM (Cap Assay Minimal) and shaken  (37 °C, 100 rpm) until the optical density OD600=0.3 was reached; we then diluted the suspension 1:10 in CAM. The bacterial suspension was injected in a microfluidic device. The microfluidic device is a simple device made by PDMS and glass, composed by three parallel channels (height 100 um). In the central channel (600 um wide) bacteria were hosted and observed. Two  walls of PDMS (200 um) separate the central channel to the left and right channels were oxygen was flown in order to reach a concentration of oxygen closed to 100\% in the central channel. 10 minutes after the injection of bacterial suspension a video was acquired at 100 frames per second for 41 second (\#4100 frames). All images were acquired through a 10× objective (Nikon microscope), Phase Contrast, using binning 2X2.
+We used B.subtilis strain OI1085 for the tracking experiment. Cells were taken from frozen stock, resuspended in CAM (Cap Assay Minimal) and shaken  (37 °C, 100 rpm) until the optical density OD600=0.3 was reached; we then diluted the suspension 1:10 in CAM. The bacterial suspension was injected in a microfluidic device. The microfluidic device is a simple device made by PDMS and glass, composed by three parallel channels (height 100 um). In the central channel (600 um wide) bacteria were hosted and observed. Two  walls of PDMS (200 um) separate the central channel to the left and right channels were oxygen was flown in order to reach a concentration of oxygen closed to 100\% in the central channel. 10 minutes after the injection of bacterial suspension a video was acquired at 100 frames per second for 41 second (\#4100 frames). All images were acquired through a 10$\times$ objective (Nikon microscope), Phase Contrast, using binning 2X2.
 All images are $512 \times 512$ pixels and have been exported in 16-bit grayscale TIFF image format.
 
+\subsection{Manipulating images using XCA}
+	In order to take advantage of the intrinsic parallel nature of CAs all the images manipulation procedures were implemented augmenting an existing CA library, opencal\cite{dambrosio:2016} which has been empowered  a set of procedures that allows seemless input/ouput and filtering.
+	More specifically each image is represented as an automata which the only existing substate represents the color of the pixel and filters are implemented as a chain of elementary processes (see listing \ref{list:imgman}).
+
+\begin{lstlisting}[language=C,caption=Example of usage of the Image processing XCA engine. A model and a CA runtime are created. The raw image is then read into the substate. Elementary processes corrensponding to the operations to be performed on the image are set and the runtime is launched. ,label=list:imgman]	
+//Model and CA engine
+std::array<uint, 2> coords = { 512,512 }
+opencal::CALMooreNeighborhood<DIMENSION,MOORERADIUS> neighbor;
+MODELTYPE calmodel(coords,
+                &neighbor,
+                opencal::calCommon::CAL_SPACE_FLAT,
+                opencal::calCommon::CAL_NO_OPT);
+CALRun calrun (&calmodel, 1, steps, opencal::calCommon::CAL_UPDATE_IMPLICIT); 
+CALSUBSTATE* bgr = calmodel.addSubstate<PIXELTYPE>();
+//Image loading
+bgr->loadSubstate(*(new std::function(loadImage<PIXELTYPE>)), "image_path");
+
+//Image Filters Creations
+ContrastStretchingFilter <2,decltype(neighbor),COORD_TYPE,PIXELTYPE>contrastStretchingFilter(bgr, 1285, 1542, 0, 65535,1.0);
+ThresholdFilter<2,decltype(neighbor),COORD_TYPE,vec1s> thresholdFilter (bgr,0,61680,0,65535);
+
+calmodel.addElementaryProcess(&contrastStretchingFilter);
+calmodel.addElementaryProcess(&thresholdFilter);
+calrun->run();
+\end{lstlisting}
+The framework is extensible as it allows to add filters to the already existing ones by only specifying the local pixel transformations to be applied or, in case of a convolutional filter the appropriate kernel.
+Using this approach we can take advantage of any library parallelization available to speed up the image processing step (opencal comes with different parallelization strategies and support for heterogenous accelaration) withouth changing the host code.
+
+
+
+
+\subsection{Bacteria Segmentation}
 The E. coli cells typically have a large range of motion patterns
 and the cell soma generally appears as a dark area surrounded
 with a white halo. But the contrast can be inverted
@@ -421,36 +438,33 @@ and the cell may appear white when it has moved sufficiently
 out of focus (see Fig. 1). In order to automatically detect coli
 cells in each frame, one can use a histogram-based thresholding
 method as suggested in \cite{Cho:1989}.
-
-
-
-\subsection{Bacteria Segmentation}
 A key step of tracking bacteria is to individuate first, and then to label and describe each of the bacteria present in the images. In order to do so a segmentation preprocessing phase is performed on all the images. 
-Segmentation  is carried out by means of threshold\cite{Shapiro:2002} method which produces a bi-partition of the pixel based on the color intensity. The value of pixel $(x,y)$ in image $g$ is given by the following where $P$ is a predicate:
+Segmentation  is carried out by means of threshold method \cite{Shapiro:2002} which produces a bi-partition of the pixel based on the color intensity. The value of pixel $(x,y)$ in image $g$ is given by the following, where $P$ is a predicate and f is the original image:
 ${g(x,y) = \begin{cases} 1, & \mbox{if } P(f(x,y),T) \\ 0, & \mbox{otherwise }\end{cases}}$.
-One drawback of using threshold method is that pixel color intensity is the only property being considerend by the bi-partition process, not any relationships between the pixels. This can easily lead to binary regions whose pixel are not contiguous or to miss or include relevant or unwanted pixels respectively. This effects can get worse as the noise increases. For this application however threshold method works well because after the application of a \texttt{contrast stretch filter} the analysed images presents high contrasts between the background and the bacteria (see figure \ref{fig:contrast}). Contrast stretch filter  stretches or scales the range of pixel values between an upper and lower limits. Pixel values that are above or below this range are saturated to the upper or lower limit value, respectively while piexels that lies in the interval are scaled according to the following formula: 
+One drawback of using threshold method is that pixel color intensity is the only property being considerend by the bi-partition process, not any relationships between the pixels. This can easily lead to binary regions whose pixel are not contiguous or to miss or include relevant or unwanted pixels respectively. This effects can get worse as the noise increases. For the problem at hand, however, the threshold method works well because after the application of a \texttt{contrast stretch filter} the analysed images presents high contrasts between the background and cells soma (see figure \ref{fig:contrast}). Contrast stretch filter  stretches or scales the range of pixel values between an upper and lower limits. Pixel values that are above or below this range are saturated to the upper or lower limit values respectively, while pixels that lies in the interval are scaled according to the following formula: 
 \[{g(x,y) = \begin{cases} L_o & \mbox{if } f(x,y) < L_i \\  H_o & \mbox{if } f(x,y) < H_i\\ L_o + (f(x,y)-L_i)\frac{H_o-L_o}{H_i-L_i} & \mbox{if } L_i \leq f(x,y) \leq H_i\end{cases}}\] where  $[L_i,H_i]$ defines the interval in the original image which is linearly scaled into the interval $[L_o,H_o]$.
 
-\begin{figure}
-\centering
-  \subcaptionbox{Origianal frame. The bacteria are represented by the small darker cluter. Light gray and white is noise and background. }[.4\linewidth]{
-    \includegraphics[width=.425\linewidth]{./images/bacteriasmall}}\quad
-  \subcaptionbox{This represents a segmented and inverted version of the image on the left. White cluster are bacteria.}[.4\linewidth][c]{%
-    \includegraphics[width=.425\linewidth]{./images/bacteriasmall_threshold}}\quad
- \end{figure}
+\begin{figure*}
+
+    \begin{minipage}[l]{1.0\columnwidth}
+        \centering
+        \includegraphics[width=8.5cm]{./images/bacteriasmall}
+        \caption{Origianal frame. The bacteria are the small darker cluter. Light gray and white is noise and background.}\label{fig:contrast}
+    \end{minipage}
+    \hfill{}
+    \begin{minipage}[r]{1.0\columnwidth}
+        \centering
+        \includegraphics[width=8.5cm]{./images/bacteriasmall_threshold}
+        \caption{This represents a segmented and inverted version of the image on the left. White cluster are bacteria.}\label{fig:BBB}
+    \end{minipage}
+\end{figure*}
+
+ 
 All the images go through a noise reduction stage which employes a combinations of \textit{gaussian}, \textit{laplacian} and \textit{blurring} filters \cite{Deng:1993}.
+Values parameters used in the Contrast Stretching and Threshold filters are dataset dependent and need to be provided upfront. The initial range of colors is affected by optical conditions at the time of the experiment such as lenses, luminosity etc. Once found the best set of parameters for one image, they can be used throughout the whole dataset since all images are taken under the same conditions.
 
-
-
-Come prima step per il tracking i batteri vanno prima individuati. Il processo di individuazione si chiama segmentazione. La stragia utilizzata è quella della soglia. metodologia scelta perchè le immagini dal microscopio presentano un forte contrasto tra lo sfondo e i cluster di pixel che rappresentano i batteri. (mostra piccola immagine se serve). 
-Tutti i filtri che sono applicati alle immagini sono implementati in una libreria c++11 utilizzando il paradigma degli automi cellulari. Ogni immagine è rappresentata da un modello bidimensionale 
-\begin{lstlisting}[language=c++]
-opencal::CALSubstate<vec1s, 2, COORD_TYPE>
-opencal::CALModel<2, opencal::CALMooreNeighborhood<2,MOORERADIUS>, COORD_TYPE>;
-\end{lstlisting}
- in cui l'unico sottostato contiene le informazioni per ogni pixel (che nelle immagini che abbiamo sono codificate in uno unsigned short) ed un vicinato di \textbf{Moore}(vedi paragrafo automi cellulari).
-Nello specifico primo di appkicare il filtro di threshold, il contrasto delle immagini viene migliorato attravero l'applicazione di un filtro di Contrast Stretching che restringe il range dell'intensità di colore di ogni  pixel (spiega come funziona questo filtro in due parole mostrando la trasformazione a cui vengono sottoposti tutti i pixel con la formula).
-Questa fase può essere accampagnata da un ulteriore applicazione di una  serie di filtri atti a diminuire il rumore di fondo (causato da abberazioni del vetrino per esempio) come il Filtro Gaussiano \footnote{Che banana è il filtro gaussiano?}. I batteri vengono segmentati applicando un filtro di threshold trasformando l'immagine in binaria, i cui pixel "colorati" sono quelli la cui intensità di colore rientra nel range passato al filtro. Questo range deve essere trovato precedentemente e è strettamente dipendente dal set di immagini che si stanno analizzando in quando è fortemente condizionato dai parametri ottici dello strumento utilizzato (obiettivo, tempo di esposizione, etc.)
+\subsection{Bacteria Tracking}
+Binary images are then used to extract the relevant information for each of the segmented bacteria. This is done by interpreting each image as a graph whose nodes are pixels and an arc $(i,j)$ exists if pixels $i$ and $j$ are set and neighbors (according to Moore's relationship). A bacteria correspond then to a connected component that are easily individuated by using an elementary processes which triggers a DFS visit from each set pixel. Once all pixels that make up the cell soma are individuated a unique ID $id_i$ identifies the bacterium univoquely, a centroid $c_i$ and a bounding box $b_i$ which describe describes the location, the shape and the area respectively are computed for each bacterium $i$. \texttt{CGAL} \cite{CGAL} is used to create and manipulate geometrical entities.
 
  Una volta segmentati  i batteri, per ognuno di essi bisogna calcolarne le informazioni che li identificano univocamente e spazialmente. Abbiamo scelto di utilizzare un poligono (la libreria geometrica usata è CGAL \textbf{(metti riferimento a CGAL importante)}versione random) i cui lati approssimano i contorni del batterio e il relativo centroide ed un ID  univoco che consiste in un intero progressivo. \textbf{Qui ci sta bene un immagine di un batterio segmentato con disegnato il poligono! (Grazie Paola)}
  Tutti batteri segmentati vengono poi filtrati in base a un criterio di conformità che dipende dalle dimensioni del poligono (eliminiamo pixel di dimensione troppo piccola, che magari sono solo rumore residuo o batteri molto fuori fuoco). se l'immagine è interpretata come un grafo allora ogni pixel attivo è un nodo, e  un arco esiste tra due nodi se e solo se le coordinate del nodo differiscono di uno(sono vicini secondo il vicinato di moore). Per ogni componente connessa di questo grafo viene avviata una visita per profondita, ed a tutti i piixel della componente connessa in esame viene asegnato lo stesso ID univoco. (vedi se è il caso di metter una msatrice sintetica di esempio)
@@ -549,6 +563,8 @@ Shapiro, Linda G, Stockman, George C. (2002). "Computer Vision". Prentice Hall. 
 \bibitem{Deng:1993} 
 G. Deng and L. W. Cahill, An adaptive Gaussian filter for noise reduction and edge detection, Nuclear Science Symposium and Medical Imaging Conference, 1993. 1615-1619 vol.3, 10.1109/NSSMIC.1993.373563
 
+\bibitem{CGAL}
+CGAL, Computational Geometry Algorithms Library, http://www.cgal.org
 \end{thebibliography}
 
 % biography section
@@ -580,8 +596,23 @@ G. Deng and L. W. Cahill, An adaptive Gaussian filter for noise reduction and ed
 
 
 
+\section{Multi GPU-MPI not part of the paper}
+Sharing data via GPUs is done via
+\begin{itemize}
+	\item Explicit copy via host
+	\item Zero-copy shared host array
+	\item Per device arrays peer-to-peer echange
+	\item Peer-to-peer memory access
+\end{itemize}
+A single host can have multiple cuda context (i.e. works with multiple GPU) and can switch between them using \texttt{cudaSetDevice}.
+Multiple hosts can establish context with the \textbf{same} GPU (the drivers take care of the resource sharing among the hosts!
 
-% that's all folks
+A simple and naive approach is to run multiple independent kernels on different devices.
+
+Cuda offers the possibility to control multiple GPUs from the same thread withouth need of CPU multithreading (single CPU host can control a number of devices).
+With \textbf{cuda streams} memcopies can be performed in parallel (up to 2 tough)
+Memo copies can also be performed without using the host at all. It's called peer-to-peer memory copy and is performed among GPUs attached to the \textbf{same} PCIe switch using \texttt{cudaMemcpyPeerAsync} API. 
+Disjoint set of GPU can communicate simulaneously. (Imagine 4 GPU in the same machine. GPUs (1,3) communicate using peer-to-peer mamory transfer and GPUs (0,2) can do the same thing at the same exact time )
 \end{document}
 
 
