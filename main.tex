@@ -4,7 +4,9 @@
 \usepackage{subcaption}
 \usepackage{caption}
 \usepackage{multicol}
-
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
+\usepackage{mdframed,framed}
 % Some very useful LaTeX packages include:
 % (uncomment the ones you want to load)
 %----------------------------------------------------------------------------------------
@@ -16,12 +18,12 @@
 %----------------------------------------------------------------------------------------
 %	ALGORITHM
 %----------------------------------------------------------------------------------------
-\usepackage[]{algorithm2e}
+%\usepackage[]{algorithm2e}
 
 
-\usepackage{mdframed,framed}
 
-\SetKwProg{Fn}{Procedure}{}{}
+
+%\SetKwProg{Fn}{Procedure}{}{}
 
 
 % *** MISC UTILITY PACKAGES ***
@@ -47,50 +49,9 @@
 
 
 
-% *** CITATION PACKAGES ***
-%
+
 %\usepackage{cite}
 
-
-% *** GRAPHICS RELATED PACKAGES ***
-%
-\ifCLASSINFOpdf
-  % \usepackage[pdftex]{graphicx}
-  % declare the path(s) where your graphic files are
-  % \graphicspath{{../pdf/}{../jpeg/}}
-  % and their extensions so you won't have to specify these with
-  % every instance of \includegraphics
-  % \DeclareGraphicsExtensions{.pdf,.jpeg,.png}
-\else
-  % or other class option (dvipsone, dvipdf, if not using dvips). graphicx
-  % will default to the driver specified in the system graphics.cfg if no
-  % driver is specified.
-  % \usepackage[dvips]{graphicx}
-  % declare the path(s) where your graphic files are
-  % \graphicspath{{../eps/}}
-  % and their extensions so you won't have to specify these with
-  % every instance of \includegraphics
-  % \DeclareGraphicsExtensions{.eps}
-\fi
-% graphicx was written by David Carlisle and Sebastian Rahtz. It is
-% required if you want graphics, photos, etc. graphicx.sty is already
-% installed on most LaTeX systems. The latest version and documentation can
-% be obtained at: 
-% http://www.ctan.org/tex-archive/macros/latex/required/graphics/
-% Another good source of documentation is "Using Imported Graphics in
-% LaTeX2e" by Keith Reckdahl which can be found as epslatex.ps or
-% epslatex.pdf at: http://www.ctan.org/tex-archive/info/
-%
-% latex, and pdflatex in dvi mode, support graphics in encapsulated
-% postscript (.eps) format. pdflatex in pdf mode supports graphics
-% in .pdf, .jpeg, .png and .mps (metapost) formats. Users should ensure
-% that all non-photo figures use a vector format (.eps, .pdf, .mps) and
-% not a bitmapped formats (.jpeg, .png). IEEE frowns on bitmapped formats
-% which can result in "jaggedy"/blurry rendering of lines and letters as
-% well as large increases in file sizes.
-%
-% You can find documentation about the pdfTeX application at:
-% http://www.tug.org/applications/pdftex
 
 
 
@@ -121,7 +82,7 @@
 
 % *** SPECIALIZED LIST PACKAGES ***
 %
-%\usepackage{algorithmic}
+
 % algorithmic.sty was written by Peter Williams and Rogerio Brito.
 % This package provides an algorithmic environment fo describing algorithms.
 % You can use the algorithmic environment in-text or within a figure
@@ -387,7 +348,62 @@ In this paper we present an algorithm for detecting and tracking particles that 
 \section{Complex Cellular Automata}
 \input{CA.tex}
 
+\section{Tracking Algorithm}
+Descrivi come date informazioni di centroidi e pokigoni che descrivono la forma delle cose che vuyoi traccare l'algoritmo trova un match tra i vari frames
+Descrivi il problema come un problema di matching che minimizza la somma del peso di ogni match (cerca problema noto e confronate la complessità)
+Poi mostra pseudocodice e commentalo.
+Mostra come usare la funzione distanza
+Analizzane la complessità temporale e spaziale
+Mostra come in teoria puoi parallelizzarlo
+Fai vedere un esempio di immagini generate sinteticamente
+Mostra come i path si incrociano e come fa l'algoritmo a distinguere due potenziali math diversi e a scegliere quello che minimizza la funzione distanza
 
+\begin{algorithm}
+\caption{TraCCA algorithm.}
+\label{alg:particlematch}
+
+	\begin{algorithmic}[1]
+		\Procedure{MyProcedure}{}
+		
+		\For{\textbf{each} $p \in  Particles $}
+			\State $neighbours \gets \text{locate closest neighbours } $
+			\For{\textbf{each} $n \in  Neighbours $}
+				\State $ \textit{computes the weight between p and each neighbour } $
+				\State $ \textit{sort in ascending order weights}$
+			
+			\EndFor
+		
+		\EndFor
+		\For{\textbf{each} $p \in  Particles $}
+		\If {$weights[p].size \neq 0$}
+		\State $\textit{candidate} \gets weights[p].first$
+		
+		\If {$\textit{candidate has not been previously assigned (?)}$}
+		\State $\textit{frame(?) [candidate]} \gets p$
+		\Else
+		\State $p_1 \gets frame[candidate]$
+		\If {$weights[p] >= weights[p_1] $}
+		\State $weights[p].pop\_front() (?)$
+		\Else
+		\State $\textit{frame(?) [candidate]} \gets p$
+		\State $weights[p_1].pop\_front() (?)$
+		\EndIf
+		\EndIf
+		\EndIf
+		\EndFor
+		
+		\For{\textbf{each} $pf \in  Frame (?)$}
+		\If {$\textit{pf is not assigned to any tracked particle }$}
+		\State {$\textit{add as a new one}$}
+		\Else
+		\State {$\textit{add pf to the list of positions of the particle to which has been assigned}$}
+		
+		\EndIf
+		\EndFor
+		\EndProcedure
+	\end{algorithmic}
+
+\end{algorithm}
 
 \section{Motility analysis of E.Coli}
 Qual è lo scopo di quest'applicazione?
@@ -464,7 +480,13 @@ All the images go through a noise reduction stage which employes a combinations 
 Values parameters used in the Contrast Stretching and Threshold filters are dataset dependent and need to be provided upfront. The initial range of colors is affected by optical conditions at the time of the experiment such as lenses, luminosity etc. Once found the best set of parameters for one image, they can be used throughout the whole dataset since all images are taken under the same conditions.
 
 \subsection{Bacteria Tracking}
-Binary images are then used to extract the relevant information for each of the segmented bacteria. This is done by interpreting each image as a graph whose nodes are pixels and an arc $(i,j)$ exists if pixels $i$ and $j$ are set and neighbors (according to Moore's relationship). A bacteria correspond then to a connected component that are easily individuated by using an elementary processes which triggers a DFS visit from each set pixel. Once all pixels that make up the cell soma are individuated a unique ID $id_i$ identifies the bacterium univoquely, a centroid $c_i$ and a bounding box $b_i$ which describe describes the location, the shape and the area respectively are computed for each bacterium $i$. \texttt{CGAL} \cite{CGAL} is used to create and manipulate geometrical entities.
+Binary images are then used to extract the relevant information for each of the segmented bacteria. This is done by interpreting each image as a graph whose nodes are pixels and an arc $(i,j)$ exists if pixels $i$ and $j$ are set and neighbors (according to Moore's relationship). A bacteria correspond then to a connected component that are easily individuated by using an elementary processes which triggers a DFS visit from each set pixel. Once all pixels that make up the cell soma are individuated a unique ID $id_i$ that  identifies the bacterium univoquely, a centroid $c_i$ and a bounding box $s_i$ which describe describes the location, the shape and the area respectively are computed for each bacterium $i$. \texttt{CGAL} \cite{CGAL} is used to create and manipulate any geometrical entities. All the bacteria whose extension is less than $M_e = 2$\textit{px} are ignored and no further considered.
+
+Weight function is a linear combination of the centroides distance and shapes difference 
+\[
+W(b_i,b_j) = a \sqrt{(c_i.x - c_j.x)^2 + (c_i,y-c_j.y)^2} + b |s_i \cap s_j|
+\]
+where $s_i$ and $s_j$ are the sets of pixels that within the bacteria bounding box.
 
  Una volta segmentati  i batteri, per ognuno di essi bisogna calcolarne le informazioni che li identificano univocamente e spazialmente. Abbiamo scelto di utilizzare un poligono (la libreria geometrica usata è CGAL \textbf{(metti riferimento a CGAL importante)}versione random) i cui lati approssimano i contorni del batterio e il relativo centroide ed un ID  univoco che consiste in un intero progressivo. \textbf{Qui ci sta bene un immagine di un batterio segmentato con disegnato il poligono! (Grazie Paola)}
  Tutti batteri segmentati vengono poi filtrati in base a un criterio di conformità che dipende dalle dimensioni del poligono (eliminiamo pixel di dimensione troppo piccola, che magari sono solo rumore residuo o batteri molto fuori fuoco). se l'immagine è interpretata come un grafo allora ogni pixel attivo è un nodo, e  un arco esiste tra due nodi se e solo se le coordinate del nodo differiscono di uno(sono vicini secondo il vicinato di moore). Per ogni componente connessa di questo grafo viene avviata una visita per profondita, ed a tutti i piixel della componente connessa in esame viene asegnato lo stesso ID univoco. (vedi se è il caso di metter una msatrice sintetica di esempio)
