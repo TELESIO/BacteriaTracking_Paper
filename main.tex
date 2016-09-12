@@ -7,6 +7,8 @@
 \usepackage{algorithm}
 \usepackage[noend]{algpseudocode}
 \usepackage{mdframed,framed}
+\usepackage{tikz}
+\usetikzlibrary{positioning,chains,fit,shapes,calc}
 % Some very useful LaTeX packages include:
 % (uncomment the ones you want to load)
 %----------------------------------------------------------------------------------------
@@ -350,6 +352,8 @@ In this paper we present an algorithm for detecting and tracking particles that 
 
 \section{Tracking Algorithm}
 Descrivi come date informazioni di centroidi e pokigoni che descrivono la forma delle cose che vuyoi traccare l'algoritmo trova un match tra i vari frames
+
+This is very similar to the assignment problem (referenza) in which bacteria at frame $i$ are matched with the ones at frame $j$. Mre formally it consits in finding a minimum matching (not necessarly perfect) in  a weigthed bipartite graph here each node in partition $1$ is connected to all nodes in partition $2$. Nodes on 
 Descrivi il problema come un problema di matching che minimizza la somma del peso di ogni match (cerca problema noto e confronate la complessità)
 Poi mostra pseudocodice e commentalo.
 Mostra come usare la funzione distanza
@@ -357,6 +361,22 @@ Analizzane la complessità temporale e spaziale
 Mostra come in teoria puoi parallelizzarlo
 Fai vedere un esempio di immagini generate sinteticamente
 Mostra come i path si incrociano e come fa l'algoritmo a distinguere due potenziali math diversi e a scegliere quello che minimizza la funzione distanza
+
+
+L'algoritmo di tracking riceve in input il singolo frame che si sta analizzando e la lista dei percorsi parziali determinati fino all'iterazione corrente. Ogni frame descrive un' immagine come una lista di particelle individuate e una matrice che le rappresenta nelle relative posizioni. Le particelle sono rappresentate da un centroide e da un poligono che ne descrive la forma.
+
+Per ogni elemento contenuto nella lista dei percorsi vengono individuate le particelle che sono presenti nel frame corrente all'interno di un dato raggio (dipendente dagli oggetti in analisi) a partire dall'ultima posizione in cui esso e' stato individuato.
+
+Per ogni potenziale associato viene calcolato un peso che puo' dipendere dalla distanza rispetto alla particella in questione, dalla somiglianza delle rispettive forme e da altri parametri che si possono facilmente personalizzare. Grazie a questi paramentri e' possibile determinare  il match migliore con gli elementi contenuti nel frame corrente da esaminare.
+
+L'elemento che matcha con il peso minore viene aggiunta al corrispondente path
+
+The assignment problem is one of the fundamental combinatorial optimization problems in the branch of optimization or operations research in mathematics. It consists of finding a maximum weight matching (or minimum weight perfect matching) in a weighted bipartite graph.
+In its most general form, the problem is as follows:
+The problem instance has a number of agents and a number of tasks. Any agent can be assigned to perform any task, incurring some cost that may vary depending on the agent-task assignment. It is required to perform all tasks by assigning exactly one agent to each task and exactly one task to each agent in such a way that the total cost of the assignment is minimized.
+If the numbers of agents and tasks are equal and the total cost of the assignment for all tasks is equal to the sum of the costs for each agent (or the sum of the costs for each task, which is the same thing in this case), then the problem is called the linear assignment problem. Commonly, when speaking of the assignment problem without any additional qualification, then the linear assignment problem is meant.
+
+
 
 \begin{algorithm}
 \caption{TraCCA algorithm.}
@@ -404,6 +424,71 @@ Mostra come i path si incrociano e come fa l'algoritmo a distinguere due potenzi
 	\end{algorithmic}
 
 \end{algorithm}
+
+
+\definecolor{myblue}{RGB}{80,80,160}
+\definecolor{mygreen}{RGB}{80,160,80}
+\begin{figure}
+\begin{tikzpicture}[thick,
+  every node/.style={draw,circle},
+  fsnode/.style={fill=gray!30},
+  ssnode/.style={fill=gray!90},
+  every fit/.style={ellipse,inner sep=-2pt,text width=2cm},
+  ->,shorten >= 3pt,shorten <= 3pt
+]
+
+% the vertices of Frame1
+\begin{scope}[start chain=going below,node distance=5mm, every node/.style={circle,minimum size=3em}]
+
+\node[fsnode,on chain,maximum size=50em] (f0)  {$p_1$};
+\node[fsnode,on chain] (f1)  {$p_2$};
+\node[below of=f1,node distance=15,yshift=-10] {$\ldots$};
+
+\node[fsnode,on chain] (f2)  {$p_{n-1}$};
+\node[fsnode,on chain] (f3) {$n$};
+\end{scope}
+
+% the vertices of Frame1
+\begin{scope}[xshift=6cm,yshift=0.0cm,start chain=going below,auto, every node/.style={circle,minimum size=3em},node distance=5mm]
+
+\node[ssnode,on chain] (s0)  {$p_1$};
+\node[ssnode,on chain] (s1)  {$p_2$};
+\node[draw=none,below of=s1,node distance=15,yshift=-10] {$\ldots$};
+
+\node[ssnode,on chain] (sk)  {$p_k$};
+\node[draw=none,below of=sk,node distance=15,,yshift=-10] {$\ldots$};
+\node[ssnode,on chain] (s2)  {$p_{m-1}$};
+\node[ssnode,on chain] (s3)  {$p_m$};
+\end{scope}
+
+
+
+% the set U
+
+\node [myblue,fit=(f0) (f3),label=above:$F_i$,draw=none] {};
+% the set V
+\node [mygreen,fit=(s0) (s2),label=above:$F_{i+1}$,draw=none,yshift=-0.8em] {};
+  \begin{scope}[every edge/.style={draw=black, thin}]
+% the edges
+\foreach \i in {0}
+	\foreach \j in {0,1,2,3}
+		\draw (f\i) edge  (s\j);
+
+   \end{scope}
+
+
+  \begin{scope}[every edge/.style={draw=black, thin}]
+% the edges
+\foreach \i in {1,2,3}
+	\foreach \j in {0,1,2,3}
+		\draw (f\i) edge  (s\j);
+
+   \end{scope}
+
+
+\end{tikzpicture}
+\caption{bskjdbksdjbfk}
+\end{figure}
 
 \section{Motility analysis of E.Coli}
 Qual è lo scopo di quest'applicazione?
@@ -505,6 +590,26 @@ In questa sezione bisogna specificare tutte le "funzioni" dell'algoritmo di trac
 Cosa sputa fuori in output?  
 
 \section{Conclusion}
+scopo: inferire modelli matematici che descrivono 
+
+toglie i tumble e checcka speed del run
+come vengono checkati i tumble?
+18micrometri al secondo risultato
+tubling di 0.2 -> running 1-0.2 =0.8 sec
+in bio il dato è cvariabile perche va da 15 a 30 (dipende dalla ref) ma ha senso dal punto di vista bio
+va giustificato con delle referenza con i Bsaptisolis
+
+2) track analizzate msd analyzer
+
+variazione nel tempo del msd => legata al coeff di diffusione
+ => legato a due cose : velocità e il tempo di tumble
+ 23 con questo metodo. biologicamente sono buoni (18 e 23) sono compatibili con veliocità di sti batteri
+ 
+quindi se con due modi diversi trovi risultati builogicamente buoni => tracking funge
+
+
+
+
 Come è stato validato il modello? (dovrebbe scriverlo alice)
 
     \begin{figure}
@@ -615,7 +720,6 @@ CGAL, Computational Geometry Algorithms Library, http://www.cgal.org
 % Can be used to pull up biographies so that the bottom of the last one
 % is flush with the other column.
 %\enlargethispage{-5in}
-
 
 
 \section{Multi GPU-MPI not part of the paper}
