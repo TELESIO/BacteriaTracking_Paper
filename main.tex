@@ -1,13 +1,16 @@
 \documentclass[conference]{IEEEtran}
 \usepackage{blindtext, graphicx}
 \usepackage{amssymb,amsmath}
-\usepackage{subcaption}
-\usepackage{caption}
+
+
 \usepackage{multicol}
-\usepackage{algorithm}
+\usepackage[linesnumbered,ruled]{algorithm2e}
 \usepackage[noend]{algpseudocode}
 \usepackage{mdframed,framed}
+
 \usepackage{tikz}
+\newcommand*\circled[1]{\tikz[baseline=(char.base)]{
+            \node[shape=circle,draw,inner sep=0.3pt] (char) {#1};}}
 \usetikzlibrary{positioning,chains,fit,shapes,calc}
 % Some very useful LaTeX packages include:
 % (uncomment the ones you want to load)
@@ -21,7 +24,6 @@
 %	ALGORITHM
 %----------------------------------------------------------------------------------------
 %\usepackage[]{algorithm2e}
-
 
 
 
@@ -238,7 +240,7 @@
 % correct bad hyphenation here
 \hyphenation{op-tical net-works semi-conduc-tor}
 
-
+\usepackage{lipsum}
 \begin{document}
 %
 % paper title
@@ -299,7 +301,7 @@ Email: mailalice}
 
 
 \begin{abstract}
-
+\lipsum[1-1]
 \end{abstract}
 
 % Note that keywords are not normally used for peerreview papers.
@@ -351,84 +353,118 @@ In this paper we present an algorithm for detecting and tracking particles that 
 \input{CA.tex}
 
 \section{Tracking Algorithm}
-Descrivi come date informazioni di centroidi e pokigoni che descrivono la forma delle cose che vuyoi traccare l'algoritmo trova un match tra i vari frames
+Objective of the tracking algorithm is to output a set $T=\{t_i=\{c_k,c_{k+1},\ldots,c_l\}\}$ of trajectories  described as a ordered list of positions in space. The length $l-k+1$ is the duration in time of the tracked movement. 
+Input particles $P=P_1 \cup P_2 \cup \ldots \cup P_n$ where $P_i$ indicates all particles at time $i$, are defined by a centroid and a bounding box which describes their geometrical properties. A function $\mathcal{F} :  P \times P \mapsto \mathbb{R}$, the \textit{distance} function, has to be provided alongside with the particles. More specifically it describes the likeliness that a particle $p$ has been transformed into $q$ as a result of a number of geometrical transformation such as translation, scaling, shearing or roation (see equation \ref{sec:bacttracking} for an example). 
 
-This is very similar to the assignment problem (referenza) in which bacteria at frame $i$ are matched with the ones at frame $j$. Mre formally it consits in finding a minimum matching (not necessarly perfect) in  a weigthed bipartite graph here each node in partition $1$ is connected to all nodes in partition $2$. Nodes on 
-Descrivi il problema come un problema di matching che minimizza la somma del peso di ogni match (cerca problema noto e confronate la complessità)
-Poi mostra pseudocodice e commentalo.
-Mostra come usare la funzione distanza
-Analizzane la complessità temporale e spaziale
+ 
+In order to construct the trajectories the algorithm works sequentially from frame $1$ to $n$ matching two subset $M_i,P_{i}$ of particles at each step where $M_i$ represents the set of particles whose trajectories can still be expanded. Informally the matching between two particles is performed s.t. to ensure that a particle in $M_i$ is associated with exactly one in $P_i$ and the distance function is minimized.
+This can be modelled as \textit{assignment problem}(referenza) which consits in finding a minimum weight matching (not necessarly perfect) in  a weigthed bipartite directed graph $G=(V,E)$ where $V=V_1 \cup V_2$ is the set of nodes and $V_1,V_2$ are the two partitions, $E = V_1 \times V_2$ s.t. $e \in E, \mathcal{W}(e) \in \mathbb{R}$ is the weight of the edge. 
+A valid matching $S \subseteq E$ must satisties the followings: 
+\[ \forall (u,v) \in S 
+\left\{
+  \begin{array}{lr}
+   (w,x) \in S,\; v=x\Longleftrightarrow u=w\\
+   \mathcal{W}(u,v) = \min_{w \in V_2} \mathcal{W}(u,w)  \\
+    \nexists \: (w,v) \in E \: \mbox{s.t.} \: \mathcal{W}(w,v) < \mathcal{W}(u,v)
+  \end{array}
+\right.
+\]
+
+If we denote the matching operator  as the following recurrence relation $(T_{i+1},M_{i+1}) = M_i \otimes P_{i+1} $, $M_0=P_0$ then the  tracking algorithm can be summarised as $(T_n,M_n) = T_{n-1} \otimes P_{n}=(((P_0 \otimes P_1)\otimes P_2) \otimes \ldots \otimes P_n)$.
+After each $\otimes$ application a particle $p$ may remain  unmatched; If this happen then we can have two cases (see figure \ref{fig:match}):
+\begin{enumerate}
+ \item if $p \in M_{i}$ the unmatch counter $u_p$ for $p$ is updated and if $u_p > P_r$, $p$ is not included in $M_{i+1}$ and the corresponding tracked trajectory is flushed into $T_i$, otherwise it is retained. This handle the case when particle may disappear from the dataset for a number of time steps and  appear again. The algorithm can still track such particles.
+ \item if $p \in P_i$ this particle correspond to a newly introduced particle which is then inserted into $M_{i+1}$. 
+\end{enumerate}
+ 
+The pseudocode \ref{alg:matching} shows how the matching procedure is implemented. Note that the \texttt{NEIGH} procedure filters the possible candidates for a particle only to those which the euclidean spatial distance is less than a threshold parameter. In many real life applications particle displacement between two subsequent time-step are small so it would be usless trying to match a particle at time $i$ with one at time $i+1$ which are spatially far.
 Mostra come in teoria puoi parallelizzarlo
 Fai vedere un esempio di immagini generate sinteticamente
 Mostra come i path si incrociano e come fa l'algoritmo a distinguere due potenziali math diversi e a scegliere quello che minimizza la funzione distanza
 
 
-L'algoritmo di tracking riceve in input il singolo frame che si sta analizzando e la lista dei percorsi parziali determinati fino all'iterazione corrente. Ogni frame descrive un' immagine come una lista di particelle individuate e una matrice che le rappresenta nelle relative posizioni. Le particelle sono rappresentate da un centroide e da un poligono che ne descrive la forma.
 
-Per ogni elemento contenuto nella lista dei percorsi vengono individuate le particelle che sono presenti nel frame corrente all'interno di un dato raggio (dipendente dagli oggetti in analisi) a partire dall'ultima posizione in cui esso e' stato individuato.
 
-Per ogni potenziale associato viene calcolato un peso che puo' dipendere dalla distanza rispetto alla particella in questione, dalla somiglianza delle rispettive forme e da altri parametri che si possono facilmente personalizzare. Grazie a questi paramentri e' possibile determinare  il match migliore con gli elementi contenuti nel frame corrente da esaminare.
-
-L'elemento che matcha con il peso minore viene aggiunta al corrispondente path
-
-The assignment problem is one of the fundamental combinatorial optimization problems in the branch of optimization or operations research in mathematics. It consists of finding a maximum weight matching (or minimum weight perfect matching) in a weighted bipartite graph.
-In its most general form, the problem is as follows:
-The problem instance has a number of agents and a number of tasks. Any agent can be assigned to perform any task, incurring some cost that may vary depending on the agent-task assignment. It is required to perform all tasks by assigning exactly one agent to each task and exactly one task to each agent in such a way that the total cost of the assignment is minimized.
-If the numbers of agents and tasks are equal and the total cost of the assignment for all tasks is equal to the sum of the costs for each agent (or the sum of the costs for each task, which is the same thing in this case), then the problem is called the linear assignment problem. Commonly, when speaking of the assignment problem without any additional qualification, then the linear assignment problem is meant.
 
 
 
 \begin{algorithm}
-\caption{TraCCA algorithm.}
-\label{alg:particlematch}
+    \SetKwInOut{Input}{Input}
+    \SetKwInOut{Output}{Output}
+   \underline{Function MATCH} $(M_i,P_{i+1})$\;
+    \Input{Matched and to be matched particles $M$ and $P$ respectively.}
+    \Output{$(T_{i+1},M_{i+1})$, which are the updated set of trajectories and matched particles.}
+	
+	$T_{i+1}=T_i$
+    
+    \ForEach{$p \in  M_i $}{
+		 $neighbours[p] \gets NEIGH(p,P_{i+1})$	\;
+		\ForEach{$n \in  neighbours[p]$}{
+			 $d[p][n] \gets DISTANCE(p,n)$\;
+		}
+		 $SORTBY(neighbours[p],d[p])$\;
+	}    
+    
 
-	\begin{algorithmic}[1]
-		\Procedure{MyProcedure}{}
-		
-		\For{\textbf{each} $p \in  Particles $}
-			\State $neighbours \gets \text{locate closest neighbours } $
-			\For{\textbf{each} $n \in  Neighbours $}
-				\State $ \textit{computes the weight between p and each neighbour } $
-				\State $ \textit{sort in ascending order weights}$
+
+		\ForEach{ $p \in  M_i $}{
 			
-			\EndFor
+			\eIf {$neighbors[p].size \neq 0$}{
+				 $\textit{candidate} \gets neighbors[p].first$
+				}
+				{
+					$p.u \gets p.u+1$\;
+					\textbf{continue}\;
+				}
 		
-		\EndFor
-		\For{\textbf{each} $p \in  Particles $}
-		\If {$weights[p].size \neq 0$}
-		\State $\textit{candidate} \gets weights[p].first$
+			\eIf {$match[candidate]=NIL$}
+			{
+				 $match[candidate] \gets p$\;
+				 $p.u \gets 0$\;
+			}
+			{
+				 $p' \gets match[candidate]$
+					
 		
-		\If {$\textit{candidate has not been previously assigned (?)}$}
-		\State $\textit{frame(?) [candidate]} \gets p$
-		\Else
-		\State $p_1 \gets frame[candidate]$
-		\If {$weights[p] >= weights[p_1] $}
-		\State $weights[p].pop\_front() (?)$
-		\Else
-		\State $\textit{frame(?) [candidate]} \gets p$
-		\State $weights[p_1].pop\_front() (?)$
-		\EndIf
-		\EndIf
-		\EndIf
-		\EndFor
+				\eIf {$d[p][candidate] >= d[p'][candidate] $}{
+					 $neighbors[p].pop()$
+				}{
+					 $\textit{match[candidate]} \gets p$\;
+					 $neighbors[p'].pop()$ \;
+					 $ p \gets p'$\;
+				}
+				\textbf{go to} $10$\;
+			}
+		}
+    
+ 	\ForEach{$p \in  P_{i+1}$}{
+		\eIf {$match[p]=NIL$}{
+			 {$T_i+1.push(<p>)$}
+		}{
+			{
+			$FIND\_TRAJ(T_{i+1},match[p]).enqueue(p)$}\;
 		
-		\For{\textbf{each} $pf \in  Frame (?)$}
-		\If {$\textit{pf is not assigned to any tracked particle }$}
-		\State {$\textit{add as a new one}$}
-		\Else
-		\State {$\textit{add pf to the list of positions of the particle to which has been assigned}$}
+			}
+		}
 		
-		\EndIf
-		\EndFor
-		\EndProcedure
-	\end{algorithmic}
-
+	\ForEach{$p \in  M_{i} \cup P_{i+1}$}{
+		\If {$p.u < P_r$}
+			 {$M_{i+1}.push(p)$}
+			
+		}
+		\Return $(T_{i+1},M_{i+1})$\;
+    
+    
+      
+ \label{alg:matching}
+    \caption{falla}
 \end{algorithm}
 
 
 \definecolor{myblue}{RGB}{80,80,160}
 \definecolor{mygreen}{RGB}{80,160,80}
 \begin{figure}
+\centering
 \begin{tikzpicture}[thick,
   every node/.style={draw,circle},
   fsnode/.style={fill=gray!30},
@@ -438,56 +474,68 @@ If the numbers of agents and tasks are equal and the total cost of the assignmen
 ]
 
 % the vertices of Frame1
-\begin{scope}[start chain=going below,node distance=5mm, every node/.style={circle,minimum size=3em}]
+\begin{scope}[start chain=going below,node distance=5mm, every node/.style={circle,minimum size=3.35em}]
 
-\node[fsnode,on chain,maximum size=50em] (f0)  {$p_1$};
-\node[fsnode,on chain] (f1)  {$p_2$};
-\node[below of=f1,node distance=15,yshift=-10] {$\ldots$};
+\node[fsnode,on chain,label=above:$\boldsymbol{M_{i}}$] (f0)  {$p^i_1$};
+\node[fsnode,on chain] (f1)  {$p^i_2$};
 
-\node[fsnode,on chain] (f2)  {$p_{n-1}$};
+\node[below of=f1,node distance=10,yshift=-10] {$\vdots$};
+
+\node[fsnode,on chain] (f2)  {$p^i_{j}$};
+\node[below of=f2,node distance=10,yshift=-10] {$\vdots$};
+\node[fsnode,on chain] (fl)  {$p^{i}_l$};
+\node[below of=fl,node distance=10,yshift=-10] {$\vdots$};
+
 \node[fsnode,on chain] (f3) {$n$};
 \end{scope}
 
 % the vertices of Frame1
-\begin{scope}[xshift=6cm,yshift=0.0cm,start chain=going below,auto, every node/.style={circle,minimum size=3em},node distance=5mm]
+\begin{scope}[xshift=6cm,start chain=going below,auto, every node/.style={circle,minimum size=3.3em},node distance=5mm]
 
-\node[ssnode,on chain] (s0)  {$p_1$};
-\node[ssnode,on chain] (s1)  {$p_2$};
-\node[draw=none,below of=s1,node distance=15,yshift=-10] {$\ldots$};
+\node[ssnode,on chain,label=above:$\boldsymbol{P_{i+1}}$] (s0)  {$p^{i+1}_1$};
+\node[ssnode,on chain] (s1)  {$p^{i+1}_2$};
+\node[draw=none,below of=s1,node distance=10,yshift=-10] {$\vdots$};
 
-\node[ssnode,on chain] (sk)  {$p_k$};
-\node[draw=none,below of=sk,node distance=15,,yshift=-10] {$\ldots$};
-\node[ssnode,on chain] (s2)  {$p_{m-1}$};
-\node[ssnode,on chain] (s3)  {$p_m$};
+\node[ssnode,on chain] (sk)  {$p^{i+1}_k$};
+\node[draw=none,below of=sk,node distance=10,yshift=-10] {$\vdots$};
+\node[ssnode,on chain] (s2)  {$p^{i+1}_{m-1}$};
+\node[ssnode,on chain] (s3)  {$p^{i+1}_m$};
 \end{scope}
-
-
-
 % the set U
 
-\node [myblue,fit=(f0) (f3),label=above:$F_i$,draw=none] {};
+\node [myblue,draw=none] {};
 % the set V
-\node [mygreen,fit=(s0) (s2),label=above:$F_{i+1}$,draw=none,yshift=-0.8em] {};
-  \begin{scope}[every edge/.style={draw=black, thin}]
+\node [mygreen,draw=none] {};
+  \begin{scope}[every edge/.style={draw,thin}]
 % the edges
+\draw (f0) edge[red, thick]  (s3);
 \foreach \i in {0}
-	\foreach \j in {0,1,2,3}
+	\foreach \j in {0,1,2}
+		\draw (f\i) edge  (s\j);
+
+
+\draw (f1) edge[red, thick]  (s0);
+\foreach \i in {1}
+	\foreach \j in {1,2,3}
+		\draw (f\i) edge  (s\j);
+
+\draw (f2) edge[red, thick]  (s1);
+\foreach \i in {2}
+	\foreach \j in {0,2,3}
+		\draw (f\i) edge  (s\j);
+
+\draw (f3) edge[red, thick]  (s2);
+\foreach \i in {3}
+	\foreach \j in {1,3,0}
 		\draw (f\i) edge  (s\j);
 
    \end{scope}
 
-
-  \begin{scope}[every edge/.style={draw=black, thin}]
-% the edges
-\foreach \i in {1,2,3}
-	\foreach \j in {0,1,2,3}
-		\draw (f\i) edge  (s\j);
-
-   \end{scope}
 
 
 \end{tikzpicture}
-\caption{bskjdbksdjbfk}
+\label{fig:match}
+\caption{This figuire depicts the assignment problem. Red arrows highlight the solution. This means that the trajectory $t=p^s_a \leadsto p^i_1$  is lengthened by $p^{i+1}_m$ becoming $t=p^s_a \leadsto p^i_1 \to p^{i+1}_m$. Unmatched particle $p^{i+1}_k$ cause a  trajectory of size one to be created while trajectory of $p^{i}_l$ may be finalized.}
 \end{figure}
 
 \section{Motility analysis of E.Coli}
@@ -565,12 +613,14 @@ All the images go through a noise reduction stage which employes a combinations 
 Values parameters used in the Contrast Stretching and Threshold filters are dataset dependent and need to be provided upfront. The initial range of colors is affected by optical conditions at the time of the experiment such as lenses, luminosity etc. Once found the best set of parameters for one image, they can be used throughout the whole dataset since all images are taken under the same conditions.
 
 \subsection{Bacteria Tracking}
+\label{ciao}
 Binary images are then used to extract the relevant information for each of the segmented bacteria. This is done by interpreting each image as a graph whose nodes are pixels and an arc $(i,j)$ exists if pixels $i$ and $j$ are set and neighbors (according to Moore's relationship). A bacteria correspond then to a connected component that are easily individuated by using an elementary processes which triggers a DFS visit from each set pixel. Once all pixels that make up the cell soma are individuated a unique ID $id_i$ that  identifies the bacterium univoquely, a centroid $c_i$ and a bounding box $s_i$ which describe describes the location, the shape and the area respectively are computed for each bacterium $i$. \texttt{CGAL} \cite{CGAL} is used to create and manipulate any geometrical entities. All the bacteria whose extension is less than $M_e = 2$\textit{px} are ignored and no further considered.
 
 Weight function is a linear combination of the centroides distance and shapes difference 
-\[
+\begin{equation*}
+\label{sec:bacttracking}
 W(b_i,b_j) = a \sqrt{(c_i.x - c_j.x)^2 + (c_i,y-c_j.y)^2} + b |s_i \cap s_j|
-\]
+\end{equation*}
 where $s_i$ and $s_j$ are the sets of pixels that within the bacteria bounding box.
 
  Una volta segmentati  i batteri, per ognuno di essi bisogna calcolarne le informazioni che li identificano univocamente e spazialmente. Abbiamo scelto di utilizzare un poligono (la libreria geometrica usata è CGAL \textbf{(metti riferimento a CGAL importante)}versione random) i cui lati approssimano i contorni del batterio e il relativo centroide ed un ID  univoco che consiste in un intero progressivo. \textbf{Qui ci sta bene un immagine di un batterio segmentato con disegnato il poligono! (Grazie Paola)}
