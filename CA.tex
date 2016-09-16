@@ -13,54 +13,52 @@
     given by the states of a predefined (usually small) set of
     neighboring cells, which is assumed invariant in space and time.
  
- Extended Cellular Automata \cite{DiGregorio&Serra-1999} represents
-    an extension of the original CA computational paradighm. 
+ Extended Cellular Automata\cite{DiGregorio&Serra-1999}  represents an extension of the original CA computational paradighm.   
+    The main differences between XCA and classical CA are in that the state can be expressed as Cartesian product of the $n$ 
+    \emph{substates}, the transition function can also be decomposed into \textit{elementary processes} that can be parametrized,
+    and non-local operation, that go under the name of \textit{global functions} are allowed.
+        The initial conditions of the system are obtained by preliminarly
+    applying a non-local initialization operation.
+    
+
+    The framework is defined as a 7-tuple $ A = <R,X,Q,P,\sigma,\Gamma,\gamma>$ where:    
+    $R$ is a finite discrete $2$dimensional space, $\Gamma=R$ is the region over the global operation are applied,
+    $X_{x_0,y_0}=\{(x,y): \left| x-x_0\right| \leq r \wedge \left| y-y_0\right| \leq r\} $ defines the \textit{Moore}'s neighborhood relationship of radius $r$, $P=\emptyset$, $\psi$ is the initialization function, $\sigma=\{\sigma_i:Q^{|X|} \mapsto Q\}$ and   $\gamma: \{\gamma_i:Q^{|\Gamma|} \rightarrow Q^{|\Gamma|}\} $ are the set of  elementary processes non-local functions, respectively.
+    
+
+%    \begin{itemize}
+%
+%    \item $R$ is the $d$-dimensional cellular space.
+%
+%    \item $\Gamma \subseteq R$ is the region over which steering\footnote{Global operations on the entire cellular space (e.g. to model external
+%      influences that can not easily be described in terms of local
+%      interactions, or to perform reductions over the whole, or a subset
+%      of, the cellular space).}  is applied.
+%
+%    \item $X$ is the geometrical pattern that specifies the neighborhood
+%      relationship; $m = |X|$ represent the number of elements in the set
+%      $X$, i.e. the number of neighbors for the central cell.
+%
+%    \item $Q = Q_0 \times Q_1 \times....\times Q_{n-1}$ is the set of
+%      cell's states, expressed as Cartesian product of the $n$ considered
+%      \emph{substates} $Q_0 \times Q_1 \times....\times Q_{n-1}$.
+%
+%    \item $P = {p_0,p_1,....,p_{p-1}}$ is the set of CA
+%      \emph{parameters}.They can allow a fine tuning of the XCA model,
+%      with the purpose of reproducing different dynamical behaviors of
+%      the phenomenon of interest.
+%
+%    \item $\psi : Q^{|R|} \rightarrow Q^{|R|}$ is the global function
+%      which define the initial conditions of the system.
+%      
+%    \item $\sigma : Q^m \rightarrow Q$ is the cell's transition function.
+%      It is split in $s$ \emph{elementary processes}, $\sigma_0,\sigma_1,
+%      ..., \sigma_{s-1}$, each one describing a particular aspect ruling
+%      the dynamic of the considered system.
+%
+%    \item $\gamma: Q^{|\Gamma|} \rightarrow Q^{|\Gamma|} \times
+%      \mathbb{R}$ is the (global) steering function.
+%
+%    \end{itemize}
 
 
-
-   
-
-    A XCA is defined as a 7-tuple $ A = <R,X,Q,P,\sigma,\Gamma,\gamma>$ where:
-
-    \begin{itemize}
-
-    \item $R$ is the $d$-dimensional cellular space.
-
-    \item $\Gamma \subseteq R$ is the region over which steering\footnote{Global operations on the entire cellular space (e.g. to model external
-      influences that can not easily be described in terms of local
-      interactions, or to perform reductions over the whole, or a subset
-      of, the cellular space).}  is applied.
-
-    \item $X$ is the geometrical pattern that specifies the neighborhood
-      relationship; $m = |X|$ represent the number of elements in the set
-      $X$, i.e. the number of neighbors for the central cell.
-
-    \item $Q = Q_0 \times Q_1 \times....\times Q_{n-1}$ is the set of
-      cell's states, expressed as Cartesian product of the $n$ considered
-      \emph{substates} $Q_0 \times Q_1 \times....\times Q_{n-1}$.
-
-    \item $P = {p_0,p_1,....,p_{p-1}}$ is the set of CA
-      \emph{parameters}.They can allow a fine tuning of the XCA model,
-      with the purpose of reproducing different dynamical behaviors of
-      the phenomenon of interest.
-
-    \item $\psi : Q^{|R|} \rightarrow Q^{|R|}$ is the global function
-      which define the initial conditions of the system.
-      
-    \item $\sigma : Q^m \rightarrow Q$ is the cell's transition function.
-      It is split in $s$ \emph{elementary processes}, $\sigma_0,\sigma_1,
-      ..., \sigma_{s-1}$, each one describing a particular aspect ruling
-      the dynamic of the considered system.
-
-    \item $\gamma: Q^{|\Gamma|} \rightarrow Q^{|\Gamma|} \times
-      \mathbb{R}$ is the (global) steering function.
-
-    \end{itemize}
-
-    The initial conditions of the system are obtained by preliminarly
-    applying the $\psi$ initialization function. Then, if $\tau$
-    represents the function which applyes the transition function
-    $\sigma$ to all the cells in $R$, as for the CA case, and $\gamma$
-    the XCA steering function, the XCA evolution is obatained by
-    applying the $\Phi = \tau \circ \gamma$ XCA global transition
-    function at discrete time steps.
