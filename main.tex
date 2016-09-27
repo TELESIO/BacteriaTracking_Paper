@@ -346,35 +346,50 @@ We have applied and validated TraCCA in investigating the motility of B. Subtili
 
 
 \section{Tracking Algorithm}
-Objective of the tracking algorithm is to output a set $T=\{t_i=\{c_k,c_{k+1},\ldots,c_l\}\}$ of trajectories  described as a ordered list of positions in space. The length $l-k+1$ is the duration in time of the tracked movement. 
-Input particles $P=P_1 \cup P_2 \cup \ldots \cup P_n$ where $P_i$ indicates all particles at time $i$, are defined by a centroid and a bounding box which describes their geometrical properties. A function $\mathcal{F} :  P \times P \mapsto \mathbb{R}$, the \textit{distance} function, has to be provided alongside with the particles. More specifically it describes the likeliness that a particle $p$ has been transformed into $q$ as a result of a number of geometrical transformation such as translation, scaling, shearing or roation (see equation \ref{sec:bacttracking} for an example). 
+Objective of the tracking algorithm is to output a 
+set $ T_n = \{ t_i \}$  s.t.  $t_i=\{ c^i_k,c^i_{k+1},\ldots,c^i_l \} $ 
+of trajectories each described as a time-ordered list of positions (of a single particle) in space from a set of input 
+particles $P=P_1 \cup P_2 \cup \ldots \cup P_n$ and a function $\mathcal{D} :  P \times P \mapsto \mathbb{R}$, 
+the \textit{distance} function. $P_i = \{p^j_i \; | \; 1 \leq j\leq n\; \}$ indicates all particles at time $i$ and each particle $p_i^j$ is defined by a centroid position, and a bounding box which describes its geometrical properties.
+$\mathcal{D}(p,q)$ measures the likeliness that a particle $p$ has been transformed into $q$ as a result of the application a number of geometrical transformations such as translation, scaling, shearing or roation (see Eq. \ref{sec:bacttracking}). 
+Indices $k$ and $l$, $k \leq l$ indicates the trajectory starting and ending time of the tracked movement respectively, and the length $l-k+1$ is its duration in time.
+Note that particles may appear or disappear at any time and hence $k\geq 0$ and $l \leq n$, moreover $|t_i| \leq l-k+1$ since a particle which has been succesfully tracked
+ from  $P_k$ to $P_{k^*} $ can disappear for a certain time and appears again in $P_{\bar{k}}$, $k \leq k^* \leq \bar{k}$. We only allows disappearing time $\bar{k}-k^* \leq \xi$ where $\xi \geq 0$ is a parameter of the algorithm. Each trajectory  $t_*=\{ c^*_k,c^*_{k+1},\ldots,c^*_l \} $ is composed by  positions of particles $p^{j_1}_k,p^{j_2}_{k+1},\ldots,p^{j_*}_l}$ at different times. This means that for our porpouse particle $p^{j_1}_k$ at frame $k$ has moved from $c^*_k$ to location of particle $p^{j_2}_{k+1}$,$c^*_{k+1}$ at time ${k+1}$ and to location of $p^{j_*}_{l}$, $c^*_l$ at time $l$. 
 
- 
-In order to construct the trajectories the algorithm works sequentially from frame $1$ to $n$ matching two subset $M_i,P_{i}$ of particles at each step where $M_i$ represents the set of particles whose trajectories can still be expanded. Informally the matching between two particles is performed s.t. to ensure that a particle in $M_i$ is associated with exactly one in $P_i$ and the distance function is minimized.
-This can be tought to be similar to the \textit{assignment problem} \cite{bellmann1978} and more specifically, it consits in finding a minimum weight matching (not necessarly perfect) in  a weigthed bipartite directed graph $G=(V,E)$ where $V=V_1 \cup V_2$ is the set of nodes and $V_1,V_2$ are the two partitions, $E = V_1 \times V_2$ s.t. $e \in E, \mathcal{W}(e) \in \mathbb{R}$ is the weight of the edge. 
+As an example, cosider a human tracking system where each $P_i$ could correnspond to all the detected bodies in a  video frame $i$ and the distance function is a linear combination of the eucliden distance between two detected bodies's centroids  and pixel-by-pixel difference in colors of all the pixels within their bounding boxes. In this context it would make sense to consider a not null disappearing time since is not uncommon for the human detection modules (which is in charge of producing the centroids and bounding box from the images) stopping to recognize a specific target only for a limited number of frames. 
+
+
+
+
+
+In order to construct the trajectories the algorithm works sequentially from frame $1$ to $n$ processing, at each step, two subsets of particles, $M_i$ and $P_{i}$, where $M_i$ contains all trajectories corrensponding ending particles $p^{j}_l$ that can still be expanded i.e. $i-l \leq \xi$ .
+Informally it tries to augment an element in $M_i$ using a particle in $P_i$ making sure at most one particle is added to it, the same particle does not augments two different trajectories and the augmenting is perfomed s.t. the distance function is minimized.
+
+Since at each step of the process we tries to assign to an element of $M_i$ one of $P_i$ the algorithm can be thought to be similar to the \textit{assignment problem} \cite{bellmann1978} and more specifically, it consits in finding a minimum weight matching (not necessarly perfect) in  a weigthed bipartite directed graph $G=(V,E)$ where $V={M_i} \cup P_i$ is the set of nodes and ${M_i}, P_i$ are the two partitions, $E = {M_i} \times P_i$ s.t. $e \in E, \mathcal{D}(e) \in \mathbb{R}$ is the weight of the edge.
 A valid matching $S \subseteq E$ must satisties the followings: 
 \[ \forall (u,v) \in S 
 \left\{
   \begin{array}{lr}
    (w,x) \in S,\; v=x\Longleftrightarrow u=w\\
-   \mathcal{W}(u,v) = \min_{w \in V_2} \mathcal{W}(u,w)  \\
-    \nexists \: (w,v) \in E \: \mbox{s.t.} \: \mathcal{W}(w,v) < \mathcal{W}(u,v)
+   \mathcal{D}(u,v) = \min_{x \in V_2} \mathcal{D}(u,x)  \\
+    \nexists \: (w,v) \in E \: \mbox{s.t.} \: \mathcal{D}(w,v) < \mathcal{D}(u,v)
   \end{array}
 \right.
 \]
 
-If we denote the matching operator  as the following recurrence relation $(T_{i+1},M_{i+1}) = M_i \otimes P_{i+1} $, $M_0=P_0$ then the  tracking algorithm can be summarised as $(T_n,M_n) = T_{n-1} \otimes P_{n}=(((P_0 \otimes P_1)\otimes P_2) \otimes \ldots \otimes P_n)$.
-After each $\otimes$ application a particle $p$ may remain  unmatched; If this happen then we can have two cases (see figure \ref{match}):
+If we denote the matching operator  as the following recurrence relation $  M_i \lozenge P_{i+1} = (T_{i+1},M_{i+1}) $, $M_0=P_0$ then the  tracking algorithm can be summarised as $(T_n,M_n) = M_{n-1} \lozenge P_{n}=(((P_0 \lozenge P_1)\lozenge P_2) \lozenge \ldots \lozenge P_n)$.
+
+After each $\lozenge$ application a particle $p \in {M_i} \cup P_i $ may remain  unmatched; If this happen then we can have two cases (see figure \ref{match}):
 \begin{enumerate}
- \item if $p \in M_{i}$ the unmatch counter $u_p$ for $p$ is updated and if $u_p > P_r$, $p$ is not included in $M_{i+1}$ and the corresponding tracked trajectory is flushed into $T_i$, otherwise it is retained. This handle the case when particle may disappear from the dataset for a number of time steps and  appear again. The algorithm can still track such particles.
- \item if $p \in P_i$ this particle correspond to a newly introduced particle which is then inserted into $M_{i+1}$. 
+ \item if $p \in M_{i}$ the disappearing time counter $u_p$ for $p$ is updated and if $u_p > \xi$, $p$ is not included in $M_{i+1}$ and the corresponding tracked trajectory is flushed into $T_i$, otherwise it is retained. This handle the case when particle may disappear from the dataset for a number of time steps and  appear again. The algorithm can still track such particles.
+ \item if $p \in P_i$ it correspond to a newly appeared particle which is then inserted into $M_{i+1}$. 
 \end{enumerate}
  
 The pseudocode \ref{alg:matching} shows how the matching procedure is implemented. Note that the \texttt{NEIGH} procedure filters the possible candidates for a particle only to those which the euclidean spatial distance is less than a threshold parameter. In many real life applications particle displacement between two subsequent time-step are small so it would be usless trying to match a particle at time $i$ with one at time $i+1$ which are spatially far.
-Mostra come in teoria puoi parallelizzarlo
-Fai vedere un esempio di immagini generate sinteticamente
-Mostra come i path si incrociano e come fa l'algoritmo a distinguere due potenziali math diversi e a scegliere quello che minimizza la funzione distanza
-
+%Mostra come in teoria puoi parallelizzarlo
+%Fai vedere un esempio di immagini generate sinteticamente
+%Mostra come i path si incrociano e come fa l'algoritmo a distinguere due potenziali math diversi e a scegliere quello che minimizza la funzione distanza
+%
 
 
 
@@ -525,7 +540,7 @@ Mostra come i path si incrociano e come fa l'algoritmo a distinguere due potenzi
 
 
 \end{tikzpicture}
-\caption{This figuire depicts the assignment problem. Red arrows highlight the solution. This means that the trajectory $t=p^s_a \leadsto p^i_1$  is lengthened by $p^{i+1}_m$ becoming $t=p^s_a \leadsto p^i_1 \to p^{i+1}_m$. Unmatched particle $p^{i+1}_k$ cause a  trajectory of size one to be created while trajectory of $p^{i}_l$ may be finalized.} \label{match}
+\caption{This figuire depicts the assignment problem. Red arrows highlight the solution. This means that the trajectory $t_*=p^s_a \leadsto p^i_1$  is lengthened by $p^{i+1}_m$ becoming $t=p^s_a \leadsto p^i_1 \to p^{i+1}_m$. Unmatched particle $p^{i+1}_k$ cause a  trajectory of size one to be created while trajectory of $p^{i}_l$ may be finalized.} \label{match}
 \end{figure}
 
 
@@ -538,7 +553,7 @@ In this section we present a Cellular Automata based framework for manipulating 
 	More specifically each image is represented as an automata which the only existing substate represents the color of the pixel and filters are implemented as a chain of elementary processes (see listing \ref{list:imgman}).
 
 \begin{framed}
-\begin{lstlisting}[language=C,caption=Example of usage of the Image processing XCA engine. A model and a CA runtime are created. The raw image is then read into the substate. Elementary processes corrensponding to the operations to be performed on the image are set and the runtime is launched. ,label=list:imgman]	
+\begin{lstlisting}[language=C++,caption=Example of usage of the Image processing XCA engine. A model and a CA runtime are created. The raw image is then read into the substate. Elementary processes corrensponding to the operations to be performed on the image are set and the runtime is launched. ,label=list:imgman]	
 //Model and CA engine
 std::array<uint, 2> coords = { 512,512 }
 opencal::CALMooreNeighborhood<DIMENSION,MOORERADIUS> neighbor;
@@ -619,9 +634,9 @@ Binary images are then used to extract the relevant information for each of the 
 Weight function is a linear combination of the centroides distance and shapes difference 
 \begin{equation}
 \label{sec:bacttracking}
-W(b_i,b_j) = a \sqrt{(c_i.x - c_j.x)^2 + (c_i,y-c_j.y)^2} + b |s_i \cap s_j
+W(c_i,c_j) = a \sqrt{(x_{c_i} - x_{c_j})^2 + (y_{c_i}-y_{c_j})^2} + b |S_i \cap S_j|
 \end{equation}
-where $s_i$ and $s_j$ are the sets of pixels that within the bacteria bounding box.
+where $S_i$ and $S_j$ are the sets of pixels within the boundaries of the bacteria's  bounding box.
 
 
 
@@ -646,6 +661,7 @@ Tumbles are associated to a decrease in velocity and a sudden change in the dire
 
 
 \section{Conclusion}
+
 \section{blablabls}
 Quanti batteri mediamente ci sono? 
 
@@ -705,9 +721,9 @@ Come è stato validato il modello? (dovrebbe scriverlo alice)
 %
 
 
-\appendices
-\section{Images Filters}
-\subsection{contrast stretch}
+%\appendices
+%\section{Images Filters}
+%\subsection{Contrast stretch}
 
 % use section* for acknowledgement
 \section*{Acknowledgment}
@@ -801,24 +817,6 @@ Nadine Tarantino, Jean-Yves Tinevez, Elizabeth Faris Crowell, Bertrand Boisson, 
 % is flush with the other column.
 %\enlargethispage{-5in}
 
-
-\section{Multi GPU-MPI not part of the paper}
-Sharing data via GPUs is done via
-\begin{itemize}
-	\item Explicit copy via host
-	\item Zero-copy shared host array
-	\item Per device arrays peer-to-peer echange
-	\item Peer-to-peer memory access
-\end{itemize}
-A single host can have multiple cuda context (i.e. works with multiple GPU) and can switch between them using \texttt{cudaSetDevice}.
-Multiple hosts can establish context with the \textbf{same} GPU (the drivers take care of the resource sharing among the hosts!
-
-A simple and naive approach is to run multiple independent kernels on different devices.
-
-Cuda offers the possibility to control multiple GPUs from the same thread withouth need of CPU multithreading (single CPU host can control a number of devices).
-With \textbf{cuda streams} memcopies can be performed in parallel (up to 2 tough)
-Memo copies can also be performed without using the host at all. It's called peer-to-peer memory copy and is performed among GPUs attached to the \textbf{same} PCIe switch using \texttt{cudaMemcpyPeerAsync} API. 
-Disjoint set of GPU can communicate simulaneously. (Imagine 4 GPU in the same machine. GPUs (1,3) communicate using peer-to-peer mamory transfer and GPUs (0,2) can do the same thing at the same exact time )
 \end{document}
 
 
