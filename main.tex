@@ -1,7 +1,7 @@
 \documentclass[conference]{IEEEtran}
 \usepackage{blindtext, graphicx}
 \usepackage{amssymb,amsmath}
-
+\usepackage{siunitx}
 
 \usepackage{multicol}
 \usepackage[linesnumbered,ruled]{algorithm2e}
@@ -259,11 +259,10 @@ Rende, Italy\\
 Email: d.spataro@mat.unical.it}
 \and
 \IEEEauthorblockN{ Alice Mari}
-
-\IEEEauthorblockA{Department of\\
+\IEEEauthorblockA{Institute for BioEngineering\\
 University of Edinburgh\\
-Edinburgh, Scotland (UK)\\
-Email: mailalice}
+King’s Buildings, EH9 3BF Edinburgh, UK\\
+Email: alicemari45@gmail.com }
 }
 % conference papers do not typically use \thanks and this command
 % is locked out in conference mode. If really needed, such as for
@@ -302,9 +301,10 @@ Email: mailalice}
 
 \begin{abstract}
 %\lipsum[1-1]
-Particle tracking plays an important role in numerous field of science for the investigating the movement of sub-micron particles, micropsheres and mulocules under microscopic observation. In this paper we present an algorithm for detecting and tracking particles based on geometrical difference evaluation and centroid displacement analysis to reconstruct the trajectories. 
-This method works for $n$-dimensional input data provided that particles are represented by at least a centroid space coordinate and a geometrical entity which describe thri shape. 
-Since 2D images is a common source of such data we also present framework for image-manipulation based on Extended Cellular Automata(XCA) paradigm.
+\textbf{PRELIMINAREEEEE}
+Particle tracking plays an important role in numerous field of science for the investigation the movement of sub-micron particles, micropsheres and mulocules under microscopic observation. In this paper we present an algorithm for detecting and tracking particles based on geometrical difference evaluation and centroid displacement analysis to reconstruct the trajectories. 
+This method works for $n$-dimensional input data provided that particles are represented by at least a centroid space coordinate and a geometrical entity which describe their shape. 
+Since 2-D images is a common source of such data we also present framework for image-manipulation based on Extended Cellular Automata (XCA) paradigm.
 
 We have applied and validated TraCCA in investigating the motility of B. Subtilis injected in a microfluidic device using 4100 images taken at 100 frames per second. 
 Results show that the framework is able to reconstruct the trajectories in such a way 
@@ -333,40 +333,40 @@ IEEEtran, journal, \LaTeX, paper, template.
 \IEEEpeerreviewmaketitle
 
 \section{Introduction}
-Particle tracking plays an important role in numerous field of science for the investigating the movement of sub-micron particles, micropsheres and mulocules under microscopic observation.  Several researches employes time-lapse microscopy, especially in the field of biophysics, as a tool to gather data and retrieve single particle time tracjetories. The researcher usually rely on manual o semi-manual/interactive software to study such properties. This approach is unfeasible when the number of cells involved in the analysis is high.
-
- In this paper we present an algorithm for detecting and tracking particles based on geometrical difference evaluation and centroid displacement analysis to reconstruct the trajectories. It iterativelly process each time partitioned  
+Particle tracking plays an important role in numerous field of science for the investigating the movement of sub-micron particles, micro-spheres and molecules under microscopic observation.  Several researches employ time-lapse microscopy, especially in the field of biophysics, as a tool to gather data and retrieve single particle time trajectories. The researcher usually rely on manual o semi-manual/interactive software to study such properties. This approach is unfeasible when the number of cells involved in the analysis is high.
 
 In this paper we present an algorithm for detecting and tracking particles that is based on image processing technique to performs segmentation and to a shape difference and centroid displacement analysis to reconstruct the trajectories. 
 This method works for $n$-dimensional input data provided that particles are represented by at least a centroid space coordinate and a geometrical entity which describe its shape. 
 Since 2D images is a common source of such data we also present framework for image-manipulation based on Extended Cellular Automata(XCA) paradigm .
 
-We have applied and validated TraCCA in investigating the motility of B. Subtilis injected in a microfluidic device using 4100 images taken at 100 frames per second. 
+We have applied and validated TraCCA in investigating the motility of B. Subtilis injected in a micro-fluidic device using 4100 images taken at 100 frames per second. 
 
 
 
 \section{Tracking Algorithm}
 Objective of the tracking algorithm is to output a 
 set $ T_n = \{ t_i \}$  s.t.  $t_i=\{ c^i_k,c^i_{k+1},\ldots,c^i_l \} $ 
-of trajectories each described as a time-ordered list of positions (of a single particle) in space from a set of input 
+of trajectories each described as a time-ordered list of positions  in space from a set of input 
 particles $P=P_1 \cup P_2 \cup \ldots \cup P_n$ and a function $\mathcal{D} :  P \times P \mapsto \mathbb{R}$, 
-the \textit{distance} function. $P_i = \{p^j_i \; | \; 1 \leq j\leq n\; \}$ indicates all particles at time $i$ and each particle $p_i^j$ is defined by a centroid position, and a bounding box which describes its geometrical properties.
-$\mathcal{D}(p,q)$ measures the likeliness that a particle $p$ has been transformed into $q$ as a result of the application a number of geometrical transformations such as translation, scaling, shearing or roation (see Eq. \ref{sec:bacttracking}). 
-Indices $k$ and $l$, $k \leq l$ indicates the trajectory starting and ending time of the tracked movement respectively, and the length $l-k+1$ is its duration in time.
-Note that particles may appear or disappear at any time and hence $k\geq 0$ and $l \leq n$, moreover $|t_i| \leq l-k+1$ since a particle which has been succesfully tracked
- from  $P_k$ to $P_{k^*} $ can disappear for a certain time and appears again in $P_{\bar{k}}$, $k \leq k^* \leq \bar{k}$. We only allows disappearing time $\bar{k}-k^* \leq \xi$ where $\xi \geq 0$ is a parameter of the algorithm. Each trajectory  $t_*=\{ c^*_k,c^*_{k+1},\ldots,c^*_l \} $ is composed by  positions of particles $p^{j_1}_k,p^{j_2}_{k+1},\ldots,p^{j_*}_l}$ at different times. This means that for our porpouse particle $p^{j_1}_k$ at frame $k$ has moved from $c^*_k$ to location of particle $p^{j_2}_{k+1}$,$c^*_{k+1}$ at time ${k+1}$ and to location of $p^{j_*}_{l}$, $c^*_l$ at time $l$. 
+the \textit{distance} function. $P_i = \{p^j_i \; | \; 1 \leq j\; \}$ indicates all particles at time $i$ and each particle $p_i^j$ is defined by a centroid position, and a bounding box which describes its geometrical properties.
+$\mathcal{D}(p,q)$ measures the likeliness that a particle $p$ has been transformed into $q$ as a result of the application a number of geometrical transformations such as translation, scaling, shearing or rotation (see Eq. \ref{sec:bacttracking}). 
+Indexes $k$ and $l$, $k \leq l$ indicate the trajectory starting and ending time of the tracked movement respectively, and the length $l-k+1$ is its duration in time.
+Note that particles may appear or disappear at any time and hence $k\geq 0$ and $l \leq n$, moreover $|t_i| \leq l-k+1$ since a particle which has been successfully tracked
+ from  $P_k$ to $P_{k^*} $ can disappear for a certain time and appears again in $P_{\bar{k}}$, $k \leq k^* \leq \bar{k}$. We only allows disappearing time $\bar{k}-k^* \leq \xi$ where $\xi \geq 0$ is a parameter of the algorithm. 
+Each trajectory  $t_*=\{ c^*_k,c^*_{k+1},\ldots,c^*_l \} $ is composed by  positions of particles $p^{j_1}_k,p^{j_2}_{k+1},\ldots,p^{j_*}_l$ at different times. 
+This means that, for our purpose, particle $p^{j_1}_k$ at frame $k$ has moved from $c^*_k$ to location of particle $p^{j_2}_{k+1}$,$c^*_{k+1}$ at time ${k+1}$ and to location of $p^{j_*}_{l}$, $c^*_l$ at time $l$. 
 
-As an example, cosider a human tracking system where each $P_i$ could correnspond to all the detected bodies in a  video frame $i$ and the distance function is a linear combination of the eucliden distance between two detected bodies's centroids  and pixel-by-pixel difference in colors of all the pixels within their bounding boxes. In this context it would make sense to consider a not null disappearing time since is not uncommon for the human detection modules (which is in charge of producing the centroids and bounding box from the images) stopping to recognize a specific target only for a limited number of frames. 
+As an example, consider a human tracking system where each $P_i$ could correspond to all the detected bodies in a  video frame $i$ and the distance function is a linear combination of the euclidean distance between two detected bodies centroids  and pixel-by-pixel difference in colors of all the pixels within their bounding boxes. In this context it would make sense to consider a not null disappearing time since is not uncommon for the human detection modules (which is in charge of producing the centroids and bounding box from the images) stopping to recognize a specific target only for a limited number of frames. 
 
 
 
 
 
-In order to construct the trajectories the algorithm works sequentially from frame $1$ to $n$ processing, at each step, two subsets of particles, $M_i$ and $P_{i}$, where $M_i$ contains all trajectories corrensponding ending particles $p^{j}_l$ that can still be expanded i.e. $i-l \leq \xi$ .
-Informally it tries to augment an element in $M_i$ using a particle in $P_i$ making sure at most one particle is added to it, the same particle does not augments two different trajectories and the augmenting is perfomed s.t. the distance function is minimized.
+In order to construct the trajectories the algorithm works sequentially from frame $1$ to $n$ processing, at each step, two subsets of particles, $M_i$ and $P_{i}$, where $M_i$ contains all the corresponding trajectories ending particles $p^{j}_l$ that can still be expanded i.e. $i-l \leq \xi$ .
+Informally it tries to augment an element in $M_i$ using a particle in $P_i$ making sure at most one particle is added to it, the same particle does not augments two different trajectories and the augmenting is performed s.t. the distance function is minimized.
 
-Since at each step of the process we tries to assign to an element of $M_i$ one of $P_i$ the algorithm can be thought to be similar to the \textit{assignment problem} \cite{bellmann1978} and more specifically, it consits in finding a minimum weight matching (not necessarly perfect) in  a weigthed bipartite directed graph $G=(V,E)$ where $V={M_i} \cup P_i$ is the set of nodes and ${M_i}, P_i$ are the two partitions, $E = {M_i} \times P_i$ s.t. $e \in E, \mathcal{D}(e) \in \mathbb{R}$ is the weight of the edge.
-A valid matching $S \subseteq E$ must satisties the followings: 
+Since at each step of the process we tries to assign to an element of $M_i$ one of $P_i$ the algorithm can be thought to be similar to the \textit{assignment problem} \cite{bellmann1978} and more specifically, it consist in finding a minimum weight matching (not necessarily perfect) in  a weighted bipartite directed graph $G=(V,E)$ where $V={M_i} \cup P_i$ is the set of nodes and ${M_i}, P_i$ are the two partitions, $E = {M_i} \times P_i$ s.t. $e \in E, \mathcal{D}(e) \in \mathbb{R}$ is the weight of the edge.
+A valid matching $S \subseteq E$ must satisfies the followings: 
 \[ \forall (u,v) \in S 
 \left\{
   \begin{array}{lr}
@@ -377,15 +377,15 @@ A valid matching $S \subseteq E$ must satisties the followings:
 \right.
 \]
 
-If we denote the matching operator  as the following recurrence relation $  M_i \lozenge P_{i+1} = (T_{i+1},M_{i+1}) $, $M_0=P_0$ then the  tracking algorithm can be summarised as $(T_n,M_n) = M_{n-1} \lozenge P_{n}=(((P_0 \lozenge P_1)\lozenge P_2) \lozenge \ldots \lozenge P_n)$.
+If we denote the matching operator  as the following recurrence relation $  M_i \lozenge P_{i+1} = (T_{i+1},M_{i+1}) $, $M_0=P_0$ then the  tracking algorithm can be summarized as $(T_n,M_n) = M_{n-1} \lozenge P_{n}=(((P_0 \lozenge P_1)\lozenge P_2) \lozenge \ldots \lozenge P_n)$.
 
 After each $\lozenge$ application a particle $p \in {M_i} \cup P_i $ may remain  unmatched; If this happen then we can have two cases (see figure \ref{match}):
 \begin{enumerate}
  \item if $p \in M_{i}$ the disappearing time counter $u_p$ for $p$ is updated and if $u_p > \xi$, $p$ is not included in $M_{i+1}$ and the corresponding tracked trajectory is flushed into $T_i$, otherwise it is retained. This handle the case when particle may disappear from the dataset for a number of time steps and  appear again. The algorithm can still track such particles.
- \item if $p \in P_i$ it correspond to a newly appeared particle which is then inserted into $M_{i+1}$. 
+ \item if $p \in P_i$ it correspond to a new appeared particle which is then inserted into $M_{i+1}$. 
 \end{enumerate}
  
-The pseudocode \ref{alg:matching} shows how the matching procedure is implemented. Note that the \texttt{NEIGH} procedure filters the possible candidates for a particle only to those which the euclidean spatial distance is less than a threshold parameter. In many real life applications particle displacement between two subsequent time-step are small so it would be usless trying to match a particle at time $i$ with one at time $i+1$ which are spatially far.
+The pseudo-code \ref{alg:matching} shows how the matching procedure is implemented. Note that the \texttt{NEIGH} procedure filters the possible candidates for a particle only to those which the euclidean spatial distance is less than a threshold parameter. In many real life applications particle displacement between two subsequent time-step are small so it would be useless trying to match a particle at time $i$ with one at time $i+1$ which are spatially far.
 %Mostra come in teoria puoi parallelizzarlo
 %Fai vedere un esempio di immagini generate sinteticamente
 %Mostra come i path si incrociano e come fa l'algoritmo a distinguere due potenziali math diversi e a scegliere quello che minimizza la funzione distanza
@@ -559,9 +559,9 @@ std::array<uint, 2> coords = { 512,512 }
 opencal::CALMooreNeighborhood<DIMENSION,MOORERADIUS> neighbor;
 MODELTYPE calmodel(coords,
                 &neighbor,
-                opencal::calCommon::CAL_SPACE_FLAT,
-                opencal::calCommon::CAL_NO_OPT);
-CALRun calrun (&calmodel, 1, steps, opencal::calCommon::CAL_UPDATE_IMPLICIT); 
+                CAL_SPACE_FLAT,
+                CAL_NO_OPT);
+CALRun calrun (&calmodel, 1, steps, CAL_UPDATE_IMPLICIT); 
 CALSUBSTATE* bgr = calmodel.addSubstate<PIXELTYPE>();
 //Image loading
 bgr->loadSubstate(*(new std::function(loadImage<PIXELTYPE>)), "image_path");
@@ -576,30 +576,30 @@ calrun->run();
 \end{lstlisting}
 \end{framed}
 The framework is extensible as it allows to add filters to the already existing ones by only specifying the local pixel transformations to be applied or, in case of a convolutional filter the appropriate kernel.
-Using this approach we can take advantage of any library parallelization available to speed up the image processing step (opencal comes with different parallelization strategies and support for heterogenous accelaration) withouth changing the host code.
+Using this approach we can take advantage of any library parallelization available to speed up the image processing step (opencal comes with different parallelization strategies and support for heterogeneous acceleration) without changing the host code.
 
 
 
-\section{Motility analysis of E.Coli}
+\section{Motility analysis of B. Subtilis}
 \label{sect:bacteriaanalysis}
 Qual è lo scopo di quest'applicazione?
 \subsection{Introduction}
 
 
 
-In this section we present an application of TraCCa to the analysis of motion of E. coli.
-We used B.subtilis strain OI1085 for the tracking experiment. Cells were taken from frozen stock, resuspended in CAM (Cap Assay Minimal) and shaken  (37 °C, 100 rpm) until the optical density OD600=0.3 was reached; we then diluted the suspension 1:10 in CAM. The bacterial suspension was injected in a microfluidic device. The microfluidic device is a simple device made by PDMS and glass, composed by three parallel channels (height 100 um). In the central channel (600 um wide) bacteria were hosted and observed. Two  walls of PDMS (200 um) separate the central channel to the left and right channels were oxygen was flown in order to reach a concentration of oxygen closed to 100\% in the central channel. 10 minutes after the injection of bacterial suspension a video was acquired at 100 frames per second for 41 second (\#4100 frames). All images were acquired through a 10$\times$ objective (Nikon microscope), Phase Contrast, using binning 2X2.
-All images are $512 \times 512$ pixels and have been exported in 16-bit grayscale TIFF image format.
+In this section we present an application of TraCCA to the analysis of motion of B. subtilis.
+We used B.subtilis strain \texttt{OI1085} for the tracking experiment. Cells were taken from frozen stock, resuspended in CAM (Cap Assay Minimal) and shaken  (\SI{37}{\degree}, 100 rpm) until the optical density $OD600=0.3$ was reached; we then diluted the suspension 1:10 in CAM. The bacterial suspension was injected in a micro-fluidic device. The micro-fluidic device is a simple device made by \textit{PDMS} and glass, composed by three parallel channels (height 100 um). In the central channel (600 um wide) bacteria were hosted and observed. Two  walls of \textit{PDMS} (\SI{200}{\micro\metre}) separate the central channel to the left and right channels were oxygen was flown in order to reach a concentration of oxygen closed to 100\% in the central channel. 10 minutes after the injection of bacterial suspension a video was acquired at 100 frames per second for \SI{41}{\second}  (\#4100 frames). All images were acquired through a 10$\times$ phase contrast objective (\textit{Nikon} microscope), using binning $2 \times 2$.
+All images are $512 \times 512$ pixels and have been exported in $16$-bit grayscale \texttt{TIFF} image format.
 
 
 
 
 \subsection{Bacteria Segmentation}
-The E. coli cells typically have a large range of motion patterns
+The E. subtilis cells typically have a large range of motion patterns
 and the cell soma generally appears as a dark area surrounded
 with a white halo. But the contrast can be inverted
 and the cell may appear white when it has moved sufficiently
-out of focus (see Fig. 1). In order to automatically detect coli
+out of focus (see Fig. 1). In order to automatically detect subtilis
 cells in each frame, one can use a histogram-based thresholding
 method as suggested in \cite{Cho:1989}.
 A key step of tracking bacteria is to individuate first, and then to label and describe each of the bacteria present in the images. In order to do so a segmentation preprocessing phase is performed on all the images. 
@@ -624,14 +624,14 @@ One drawback of using threshold method is that pixel color intensity is the only
 \end{figure*}
 
  
-All the images go through a noise reduction stage which employes a combinations of \textit{gaussian}, \textit{laplacian} and \textit{blurring} filters \cite{Deng:1993}.
+All the images go through a noise reduction stage which employs a combinations of \textit{gaussian}, \textit{laplacian} and \textit{blurring} filters \cite{Deng:1993}.
 Values parameters used in the Contrast Stretching and Threshold filters are dataset dependent and need to be provided upfront. The initial range of colors is affected by optical conditions at the time of the experiment such as lenses, luminosity etc. Once found the best set of parameters for one image, they can be used throughout the whole dataset since all images are taken under the same conditions.
 
 \subsection{Bacteria Tracking}
 \label{ciao}
-Binary images are then used to extract the relevant information for each of the segmented bacteria. This is done by interpreting each image as a graph whose nodes are pixels and an arc $(i,j)$ exists if pixels $i$ and $j$ are set and neighbors (according to Moore's relationship). A bacteria correspond then to a connected component that are easily individuated by using an elementary processes which triggers a DFS visit from each set pixel. Once all pixels that make up the cell soma are individuated a unique ID $id_i$ that  identifies the bacterium univoquely, a centroid $c_i$ and a bounding box $s_i$ which describe describes the location, the shape and the area respectively are computed for each bacterium $i$. \texttt{CGAL} \cite{CGAL} is used to create and manipulate any geometrical entities. All the bacteria whose extension is less than $M_e = 2$\textit{px} are ignored and no further considered.
+Binary images are then used to extract the relevant information for each of the segmented bacteria. This is done by interpreting each image as a graph whose nodes are pixels and an arc $(i,j)$ exists if pixels $i$ and $j$ are set and neighbors (according to Moore's relationship). A bacteria correspond then to a connected component that are easily individuated by using an elementary processes which triggers a DFS visit from each set pixel. Once all pixels that make up the cell soma are individuated a unique ID $id_i$ that  identifies the bacterium uniquely, a centroid $c_i$ and a bounding box $s_i$ which describe describes the location, the shape and the area respectively are computed for each bacterium $i$. \texttt{CGAL} \cite{CGAL} is used to create and manipulate any geometrical entities. All the bacteria whose extension is less than $M_e = 2$\textit{px} are ignored and no further considered.
 
-Weight function is a linear combination of the centroides distance and shapes difference 
+Weight function is a linear combination of the centroids distance and shapes difference 
 \begin{equation}
 \label{sec:bacttracking}
 W(c_i,c_j) = a \sqrt{(x_{c_i} - x_{c_j})^2 + (y_{c_i}-y_{c_j})^2} + b |S_i \cap S_j|
@@ -644,20 +644,17 @@ where $S_i$ and $S_j$ are the sets of pixels within the boundaries of the bacter
 
 
 \section{Analysis and Validation}
-Starting from the relationship $D_b=  (v^2 t_t)/2$  \cite{Berg:1993} that links the diffusion coefficient to both swim velocity ($v$) and tumbling time ($tt$), 
-we considered two possible methods to find $Db$:
-\begin{enumerate}
-	\item Mean Square Displacement (MSD) in time
-	\item inspecting the trajectories to identify the tumbling/running events.
-\end{enumerate}
-	
-	Since from bacterial trajectories it is possible to compute the (MSD) in time, for each experiment at homogenous oxygen concentration (see section \ref{sect:bacteriaanalysis}) we have analyzed all trajectories longer than $1$s  using the \texttt{MSDANALYZER} \cite{msdanalyzer}\cite{msdanalyzer:web} in \textit{MATLAB}  to compute the \textit{MSD} in time. Then considering the relationship:
-$MSD(t)=(  v^2 t_R^2)/2 (2t/t_R +e^((-2t)/t_R )-1)$ \cite{Howse:2007}
-where $v$ is the swimming speed, $t_R$ is the timescale associated to rotational diffusion that is $t_R=2t_t$, it is possible to obtain $t_R $and $v$ via fitting. $t_t$ and $v$ are then used to compute $Db$.
+Starting from the relationship $D_b=  \frac{v^2 t_t}{2}$  \cite{Berg:1993} that links the diffusion coefficient to both swim velocity ($v$) and tumbling time ($tt$), 
+we have separated each trajectory into running and tumbling events \footnote{An additional validation has been performed, which, for the sake of brevity is only outlined here, uses \textit{Mean Square Displacement} (\texttt{MSD}) in time and considering the following relationship $MSD(t)=\frac{1}{2}\frac{v^2 t_R^2}{2t/t_R +e^{\frac{-2t}{t_R}-1}}$ \cite{Howse:2007} where $v$ is the swimming speed, $t_R$ is the timescale associated to rotational diffusion that is $t_R=2t_t$, it is possible to obtain $t_R $ and $v$ via fitting. $t_t$ and $v$ are then used to compute $D_b$}. 
+    \begin{figure}[b]
+         \includegraphics[width=9.3cm,height=7cm]{./images/runtumble.png}
+        \caption{Trajectories}\label{fig:}
+    \end{figure}
+Those events allows the swimming speed to be calculated as difference between subsequent bacteria positions. The tumbling time can be calculated as the time spent tumbling divided by the number of tumbling events. Inspired by the work of \textit{Wong-Ng et al.} \cite{Wong2016} we wrote an algorithm, implemented in \textit{MATLAB}, which detects such tumbling events. The algorithm considers only trajectories that last more than $M_d=5$s, then it smooths trajectories over a few point. 
+Tumbles are associated to a decrease in linear velocity and a sudden change of the angular velocity (direction of the motion). Thus analyzing trajectories and fixing a threshold on both linear and angular velocities the algorithm identifies tumbling events and then it computes the mean values $t_t$ and $v$ over all the trajectories of the experiment. 
 
 
-The second method adopted to find the swimming speed and the tumbling time from bacterial trajectories consists in inspecting the trajectories in order to identify the tumbling/running events. Thos events allows the swimming speed to be calculated as difference between subsequent bacteria positions. The tumbling time can be calculated as the time spent tumbling divided by the number of tumbling events. Inspired by the work of \textit{Wong-Ng et al.} we wrote an algorithm, implemented in \textit{MATLAB}, which detects such tumbling events. The algorithm (Appendix D) considers only trajectories that last more than 5s, then it smooths trajectories over a few point. 
-Tumbles are associated to a decrease in velocity and a sudden change in the direction of the motion. Thus analysing trajectories and fixing a threshold on both linear and angular velocities the algorithm identifies tumbling events and then it computes the mean values $t_t$ and $v$ over all the trajectories of the experiment. 
+
 
 
 \section{Conclusion}
@@ -788,6 +785,10 @@ OPENCAL download page: \url{https://github.com/OpenCALTeam/opencal-user-guide}
 Nadine Tarantino, Jean-Yves Tinevez, Elizabeth Faris Crowell, Bertrand Boisson, Ricardo Henriques, Musa Mhlanga, Fabrice Agou, Alain Israël, and Emmanuel Laplantine. TNF and IL-1 exhibit distinct ubiquitin requirements for inducing NEMO-IKK supramolecular structures. J Cell Biol (2014) vol. 204 (2) pp. 231-45
 \bibitem{msdanalyzer:web}
 \url{http://tinevez.github.io/msdanalyzer/}
+
+\bibitem{Wong2016}
+Wong-Ng J, Melbinger A, Celani A, Vergassola M (2016) The Role of Adaptation in Bacterial Speed Races. PLoS Comput Biol 12(6): e1004974. doi: 10.1371/journal.pcbi.1004974
+
 \end{thebibliography}
 
 % biography section
