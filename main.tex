@@ -1,4 +1,4 @@
-\documentclass[conference]{IEEEtran}
+ \documentclass[conference]{IEEEtran}
 \usepackage{blindtext, graphicx}
 \usepackage{amssymb,amsmath}
 \usepackage{siunitx}
@@ -301,12 +301,10 @@ Email: alicemari45@gmail.com }
 
 \begin{abstract}
 %\lipsum[1-1]
-\textbf{PRELIMINAREEEEE}
 Particle tracking plays an important role in numerous field of science for the investigation the movement of sub-micron particles, micropsheres and mulocules under microscopic observation. In this paper we present an algorithm for detecting and tracking particles based on geometrical difference evaluation and centroid displacement analysis to reconstruct the trajectories. 
 This method works for $n$-dimensional input data provided that particles are represented by at least a centroid space coordinate and a geometrical entity which describe their shape. 
 Since 2-D images is a common source of such data we also present framework for image-manipulation based on Extended Cellular Automata (XCA) paradigm.
-
-We have applied and validated TraCCA in investigating the motility of B. Subtilis injected in a microfluidic device using 4100 images taken at 100 frames per second. 
+We have applied and validated TraCCA in investigating the motility of \textit{B. subtilis.} injected in a microfluidic device using 4100 images taken at 100 frames per second. 
 Results show that the framework is able to reconstruct the trajectories in such a way 
 
 
@@ -339,7 +337,7 @@ In this paper we present an algorithm for detecting and tracking particles that 
 This method works for $n$-dimensional input data provided that particles are represented by at least a centroid space coordinate and a geometrical entity which describe its shape. 
 Since 2D images is a common source of such data we also present framework for image-manipulation based on Extended Cellular Automata(XCA) paradigm .
 
-We have applied and validated TraCCA in investigating the motility of B. Subtilis injected in a micro-fluidic device using 4100 images taken at 100 frames per second. 
+We have applied and validated TraCCA in investigating the motility of \textit{B. subtilis.} injected in a micro-fluidic device using 4100 images taken at 100 frames per second. 
 
 
 
@@ -365,7 +363,7 @@ As an example, consider a human tracking system where each $P_i$ could correspon
 In order to construct the trajectories the algorithm works sequentially from frame $1$ to $n$ processing, at each step, two subsets of particles, $M_i$ and $P_{i}$, where $M_i$ contains all the corresponding trajectories ending particles $p^{j}_l$ that can still be expanded i.e. $i-l \leq \xi$ .
 Informally it tries to augment an element in $M_i$ using a particle in $P_i$ making sure at most one particle is added to it, the same particle does not augments two different trajectories and the augmenting is performed s.t. the distance function is minimized.
 
-Since at each step of the process we tries to assign to an element of $M_i$ one of $P_i$ the algorithm can be thought to be similar to the \textit{assignment problem} \cite{bellmann1978} and more specifically, it consist in finding a minimum weight matching (not necessarily perfect) in  a weighted bipartite directed graph $G=(V,E)$ where $V={M_i} \cup P_i$ is the set of nodes and ${M_i}, P_i$ are the two partitions, $E = {M_i} \times P_i$ s.t. $e \in E, \mathcal{D}(e) \in \mathbb{R}$ is the weight of the edge.
+Since at each step of the process we try to assign to an element of $M_i$ one of $P_i$ the algorithm can be thought to be similar to the \textit{assignment problem} \cite{bellmann1978} and more specifically, it consists in finding a minimum weight matching (not necessarily perfect) in  a weighted bipartite directed graph $G=(V,E)$ where $V={M_i} \cup P_i$ is the set of nodes and ${M_i}, P_i$ are the two partitions, $E = {M_i} \times P_i$ s.t. $e \in E, \mathcal{D}(e) \in \mathbb{R}$ is the weight of the edge.
 A valid matching $S \subseteq E$ must satisfies the followings: 
 \[ \forall (u,v) \in S 
 \left\{
@@ -379,22 +377,14 @@ A valid matching $S \subseteq E$ must satisfies the followings:
 
 If we denote the matching operator  as the following recurrence relation $  M_i \lozenge P_{i+1} = (T_{i+1},M_{i+1}) $, $M_0=P_0$ then the  tracking algorithm can be summarized as $(T_n,M_n) = M_{n-1} \lozenge P_{n}=(((P_0 \lozenge P_1)\lozenge P_2) \lozenge \ldots \lozenge P_n)$.
 
-After each $\lozenge$ application a particle $p \in {M_i} \cup P_i $ may remain  unmatched; If this happen then we can have two cases (see figure \ref{match}):
+After each $\lozenge$ application a particle $p \in {M_i} \cup P_i $ may remain  unmatched; If this happens then we can have two cases (see figure \ref{match}):
 \begin{enumerate}
- \item if $p \in M_{i}$ the disappearing time counter $u_p$ for $p$ is updated and if $u_p > \xi$, $p$ is not included in $M_{i+1}$ and the corresponding tracked trajectory is flushed into $T_i$, otherwise it is retained. This handle the case when particle may disappear from the dataset for a number of time steps and  appear again. The algorithm can still track such particles.
- \item if $p \in P_i$ it correspond to a new appeared particle which is then inserted into $M_{i+1}$. 
+ \item if $p \in M_{i}$ the disappearing time counter $u_p$ for $p$ is updated and if $u_p > \xi$, $p$ is not included in $M_{i+1}$ and the corresponding tracked trajectory is flushed into $T_i$, otherwise it is retained. This handles the case when particle may disappear from the dataset for a number of time steps and  appear again. The algorithm can still track such particles.
+ \item if $p \in P_i$ it corresponds to a new appeared particle which is then inserted into $M_{i+1}$. 
 \end{enumerate}
  
 The pseudo-code \ref{alg:matching} shows how the matching procedure is implemented. Note that the \texttt{NEIGH} procedure filters the possible candidates for a particle only to those which the euclidean spatial distance is less than a threshold parameter. In many real life applications particle displacement between two subsequent time-step are small so it would be useless trying to match a particle at time $i$ with one at time $i+1$ which are spatially far.
-%Mostra come in teoria puoi parallelizzarlo
-%Fai vedere un esempio di immagini generate sinteticamente
-%Mostra come i path si incrociano e come fa l'algoritmo a distinguere due potenziali math diversi e a scegliere quello che minimizza la funzione distanza
-%
-
-
-
-
-\begin{algorithm}
+\begin{algorithm}[h]
     \SetKwInOut{Input}{Input}
     \SetKwInOut{Output}{Output}
    \underline{Function MATCH} $(M_i,P_{i+1})$\;
@@ -463,7 +453,7 @@ The pseudo-code \ref{alg:matching} shows how the matching procedure is implement
     
       
  \label{alg:matching}
-    \caption{falla}
+    \caption{ssdsdsvc}
 \end{algorithm}
 
 
@@ -549,8 +539,11 @@ The pseudo-code \ref{alg:matching} shows how the matching procedure is implement
 In this section we present a Cellular Automata based framework for manipulating images that allows seemless parallel filters application.
 \input{CA.tex}
 
-	In order to take advantage of the intrinsic parallel nature of CAs all the images manipulation procedures were implemented augmenting an existing CA library, opencal\cite{dambrosio:2016} \cite{opencalurl} \cite{opencalmanual} which has been empowered  a set of procedures that allows seemless input/ouput and filtering.
-	More specifically each image is represented as an automata which the only existing substate represents the color of the pixel and filters are implemented as a chain of elementary processes (see listing \ref{list:imgman}).
+\subsection{Definition and Usage}
+The framework is defined as a 7-tuple $ A = \langle R,X,Q,P,\sigma,\Gamma,\gamma \rangle$ where $R$ is a finite discrete $2$-dimensional space, $\Gamma=R$ is the region over the global operation are applied, $X=X(x_0,y_0)=\{(x,y): \left| x-x_0\right| \leq r \wedge \left| y-y_0\right| \leq r\} $ defines the \textit{Moore}'s neighborhood relationship of radius $r$, $P=\emptyset$, $\psi$ is the initialization function, $\sigma=\{\sigma_i:Q^{|X|} \mapsto Q\}$ and   $\gamma= \{\gamma_i:Q^{|\Gamma|} \rightarrow Q^{|\Gamma|}\} $ are the set of  elementary processes non-local functions, respectively.
+    
+In order to take advantage of the intrinsic parallel nature of CAs all the images manipulation procedures were implemented augmenting an existing CA library, opencal\cite{dambrosio:2016} \cite{opencalurl} \cite{opencalmanual} which has been empowered  a set of procedures that allows seemless input/ouput and filtering.
+More specifically each image is represented as an automata which the only existing substate represents the color of the pixel and filters are implemented as a chain of elementary processes (see listing \ref{list:imgman}).
 
 \begin{framed}
 \begin{lstlisting}[language=C++,caption=Example of usage of the Image processing XCA engine. A model and a CA runtime are created. The raw image is then read into the substate. Elementary processes corrensponding to the operations to be performed on the image are set and the runtime is launched. ,label=list:imgman]	
@@ -576,40 +569,15 @@ calrun->run();
 \end{lstlisting}
 \end{framed}
 The framework is extensible as it allows to add filters to the already existing ones by only specifying the local pixel transformations to be applied or, in case of a convolutional filter the appropriate kernel.
-Using this approach we can take advantage of any library parallelization available to speed up the image processing step (opencal comes with different parallelization strategies and support for heterogeneous acceleration) without changing the host code.
+Using this approach we can take advantage of any library parallelization available to speed up the image processing step (opencal comes with different parallelization strategies and support for heterogeneous acceleration) without changing the host code. This can be extremely helpful in such cases where the size of the images is s.t. sequential processing would become a bottleneck.
 
 
 
-\section{Motility analysis of B. Subtilis}
+\section{Motility analysis of B. subtilis}
 \label{sect:bacteriaanalysis}
-Qual è lo scopo di quest'applicazione?
 \subsection{Introduction}
 
-
-
-In this section we present an application of TraCCA to the analysis of motion of B. subtilis.
-We used B.subtilis strain \texttt{OI1085} for the tracking experiment. Cells were taken from frozen stock, resuspended in CAM (Cap Assay Minimal) and shaken  (\SI{37}{\degree}, 100 rpm) until the optical density $OD600=0.3$ was reached; we then diluted the suspension 1:10 in CAM. The bacterial suspension was injected in a micro-fluidic device. The micro-fluidic device is a simple device made by \textit{PDMS} and glass, composed by three parallel channels (height 100 um). In the central channel (600 um wide) bacteria were hosted and observed. Two  walls of \textit{PDMS} (\SI{200}{\micro\metre}) separate the central channel to the left and right channels were oxygen was flown in order to reach a concentration of oxygen closed to 100\% in the central channel. 10 minutes after the injection of bacterial suspension a video was acquired at 100 frames per second for \SI{41}{\second}  (\#4100 frames). All images were acquired through a 10$\times$ phase contrast objective (\textit{Nikon} microscope), using binning $2 \times 2$.
-All images are $512 \times 512$ pixels and have been exported in $16$-bit grayscale \texttt{TIFF} image format.
-
-
-
-
-\subsection{Bacteria Segmentation}
-The E. subtilis cells typically have a large range of motion patterns
-and the cell soma generally appears as a dark area surrounded
-with a white halo. But the contrast can be inverted
-and the cell may appear white when it has moved sufficiently
-out of focus (see Fig. 1). In order to automatically detect subtilis
-cells in each frame, one can use a histogram-based thresholding
-method as suggested in \cite{Cho:1989}.
-A key step of tracking bacteria is to individuate first, and then to label and describe each of the bacteria present in the images. In order to do so a segmentation preprocessing phase is performed on all the images. 
-Segmentation  is carried out by means of threshold method \cite{Shapiro:2002} which produces a bi-partition of the pixel based on the color intensity. The value of pixel $(x,y)$ in image $g$ is given by the following, where $P$ is a predicate and f is the original image:
-${g(x,y) = \begin{cases} 1, & \mbox{if } P(f(x,y),T) \\ 0, & \mbox{otherwise }\end{cases}}$.
-One drawback of using threshold method is that pixel color intensity is the only property being considerend by the bi-partition process, not any relationships between the pixels. This can easily lead to binary regions whose pixel are not contiguous or to miss or include relevant or unwanted pixels respectively. This effects can get worse as the noise increases. For the problem at hand, however, the threshold method works well because after the application of a \texttt{contrast stretch filter} the analysed images presents high contrasts between the background and cells soma (see figure \ref{contrast}). Contrast stretch filter  stretches or scales the range of pixel values between an upper and lower limits. Pixel values that are above or below this range are saturated to the upper or lower limit values respectively, while pixels that lies in the interval are scaled according to the following formula: 
-\[{g(x,y) = \begin{cases} L_o & \mbox{if } f(x,y) < L_i \\  H_o & \mbox{if } f(x,y) < H_i\\ L_o + (f(x,y)-L_i)\frac{H_o-L_o}{H_i-L_i} & \mbox{if } L_i \leq f(x,y) \leq H_i\end{cases}}\] where  $[L_i,H_i]$ defines the interval in the original image which is linearly scaled into the interval $[L_o,H_o]$.
-
 \begin{figure*}
-
     \begin{minipage}[l]{1.0\columnwidth}
         \centering
         \includegraphics[width=8.5cm]{./images/bacteriasmall}
@@ -622,14 +590,42 @@ One drawback of using threshold method is that pixel color intensity is the only
         \caption{This represents a segmented and inverted version of the image on the left. White cluster are bacteria.}\label{BBB}
     \end{minipage}
 \end{figure*}
+In this section we present an application of TraCCA to the analysis of motion of \textit{B. subtilis.}
+The analysis of trajectories in bacteria is really interesting because it is a non-invasive way to extracting many information about their chemotaxis which is the ability of bacteria to sense and respond to chemicals.
+Thanks to chemotaxis, bacteria are able to reach a source of nutrient and run away from repellent, which makes it a key characteristic for their survival. Studying chemotaxis is really interesting not only because has a strong influence on many biological mechanisms, e.g. biofilm formation and disease pathogenesis but also because  evolution's natural selection has optimized bacterial chemotaxis making bacteria excellent source-seekers and their strategies can be used to design bio-inspired, simple and efficient algorithms for robotic source locating systems. 
+The motility  \textit{B. subtilis} is composed by a series of run (bacteria swim along smooth segments) and \textit{``tumbles''} (cells stop and randomly select a new direction).
+Combining run and tumbles bacteria are able to direct their motility in order to reach nutrients and run away from repellent, in other words, to do their chemotaxis.
+An algorithm that is able to track bacteria is really useful  because from bacterial trajectories many information about the way bacteria do chemotaxis (e.g. duration of the run, swimming speed, frequency of tumbling events) can be extracted. 
+These information are important in studying the strategy to reach a source of nutrient they adopt; moreover it is also interesting to investigating how the trajectories changes as certain environmental conditions change, such as temperature, oxygen concentration or gradient of chemicals.
 
- 
+
+In this work we used \textit{B. subtilis} strain \texttt{OI1085} for the tracking experiment. Cells were taken from frozen stock, resuspended in CAM (Cap Assay Minimal) and shaken  (\SI{37}{\degree}, 100 rpm) until the optical density $OD600=0.3$ was reached; we then diluted the suspension 1:10 in CAM. The bacterial suspension was injected in a micro-fluidic device. The micro-fluidic device is a simple device made by \textit{PDMS} and glass, composed by three parallel channels (height 100 um). In the central channel (600 um wide) bacteria were hosted and observed. Two  walls of \textit{PDMS} (\SI{200}{\micro\metre}) separate the central channel to the left and right channels were oxygen was flown in order to reach a concentration of oxygen closed to 100\% in the central channel. 10 minutes after the injection of bacterial suspension a video was acquired at 100 frames per second for \SI{41}{\second}  (\#4100 frames). All images were acquired through a 10$\times$ phase contrast objective (\textit{Nikon} microscope), using binning $2 \times 2$.
+All images are $512 \times 512$ pixels and have been exported in $16$-bit grayscale \texttt{TIFF} image format.
+
+
+
+
+\subsection{Bacteria Segmentation}
+
+The \textit{B. subtilis} cells typically have a large range of motion patterns and the cell soma generally appears as a dark area surrounded with a white halo.
+Colors can be inverted and the cell may appear white when it  moves out of focus sufficiently (see Figure \ref{contrast}).
+In order to automatically detect \textit{subtilis} cells in each frame, it is possible to use a histogram-based thresholding method as suggested in \cite{Cho:1989}.
+A key step of tracking bacteria is to individuate first, and then to label and describe each of the bacteria present in the images.
+In order to do so a segmentation preprocessing phase is performed on all the images. 
+Segmentation  is carried out by means of threshold method \cite{Shapiro:2002} which produces a bi-partition of the pixel based on the color intensity. The value of pixel $(x,y)$ in image $g$ is given by the following, where $P$ is a predicate and f is the original image:
+${g(x,y) = \begin{cases} 1, & \mbox{if } P(f(x,y),T) \\ 0, & \mbox{otherwise }\end{cases}}$.
+One drawback of using threshold method is that pixel color intensity is the only property being considerend by the bi-partition process, not any relationships between the pixels. This can easily lead to binary regions whose pixel are not contiguous or to miss or include relevant or unwanted pixels respectively. This effects can get worse as the noise increases. For the problem at hand, however, the threshold method works well because after the application of a \texttt{contrast stretch filter} the analysed images presents high contrasts between the background and cells soma (see figure \ref{contrast}).
+Contrast stretch filter  stretches or scales the range of pixel values between an upper and lower limits.
+Pixel values that are above or below this range are saturated to the upper or lower limit values respectively, while pixels that lies in the interval are scaled according to the following formula: 
+\[{g(x,y) = \begin{cases} L_o & \mbox{if } f(x,y) < L_i \\  H_o & \mbox{if } f(x,y) < H_i\\ L_o + (f(x,y)-L_i)\frac{H_o-L_o}{H_i-L_i} & \mbox{if } L_i \leq f(x,y) \leq H_i\end{cases}}\] where  $[L_i,H_i]$ defines the interval in the original image which is linearly scaled into the interval $[L_o,H_o]$.
+
 All the images go through a noise reduction stage which employs a combinations of \textit{gaussian}, \textit{laplacian} and \textit{blurring} filters \cite{Deng:1993}.
 Values parameters used in the Contrast Stretching and Threshold filters are dataset dependent and need to be provided upfront. The initial range of colors is affected by optical conditions at the time of the experiment such as lenses, luminosity etc. Once found the best set of parameters for one image, they can be used throughout the whole dataset since all images are taken under the same conditions.
+The entire dataset processed in a parallel manner 
 
 \subsection{Bacteria Tracking}
-\label{ciao}
-Binary images are then used to extract the relevant information for each of the segmented bacteria. This is done by interpreting each image as a graph whose nodes are pixels and an arc $(i,j)$ exists if pixels $i$ and $j$ are set and neighbors (according to Moore's relationship). A bacteria correspond then to a connected component that are easily individuated by using an elementary processes which triggers a DFS visit from each set pixel. Once all pixels that make up the cell soma are individuated a unique ID $id_i$ that  identifies the bacterium uniquely, a centroid $c_i$ and a bounding box $s_i$ which describe describes the location, the shape and the area respectively are computed for each bacterium $i$. \texttt{CGAL} \cite{CGAL} is used to create and manipulate any geometrical entities. All the bacteria whose extension is less than $M_e = 2$\textit{px} are ignored and no further considered.
+
+Binary images are then used to extract the relevant information for each of the segmented bacteria. This is done by interpreting each image as a graph whose nodes are pixels and an arc $(i,j)$ exists if pixels $i$ and $j$ are set and neighbors (according to \textit{Moore}'s relationship, see section \ref{sec:CA}). A bacteria correspond then to a connected component that are easily individuated by using an elementary processes which triggers a DFS visit from each set pixel. Once all pixels that make up the cell soma are individuated a unique ID $id_i$ that  identifies the bacterium uniquely, a centroid $c_i$ and a bounding box $s_i$ which describe describes the location, the shape and the area respectively are computed for each bacterium $i$. \texttt{CGAL} \cite{CGAL} is used to create and manipulate any geometrical entities. All the bacteria whose extension is less than $M_e = 2$\textit{px} are ignored and no further considered.
 
 Weight function is a linear combination of the centroids distance and shapes difference 
 \begin{equation}
@@ -646,61 +642,34 @@ where $S_i$ and $S_j$ are the sets of pixels within the boundaries of the bacter
 \section{Analysis and Validation}
 Starting from the relationship $D_b=  \frac{v^2 t_t}{2}$  \cite{Berg:1993} that links the diffusion coefficient to both swim velocity ($v$) and tumbling time ($tt$), 
 we have separated each trajectory into running and tumbling events \footnote{An additional validation has been performed, which, for the sake of brevity is only outlined here, uses \textit{Mean Square Displacement} (\texttt{MSD}) in time and considering the following relationship $MSD(t)=\frac{1}{2}\frac{v^2 t_R^2}{2t/t_R +e^{\frac{-2t}{t_R}-1}}$ \cite{Howse:2007} where $v$ is the swimming speed, $t_R$ is the timescale associated to rotational diffusion that is $t_R=2t_t$, it is possible to obtain $t_R $ and $v$ via fitting. $t_t$ and $v$ are then used to compute $D_b$}. 
-    \begin{figure}[b]
+
+Those events allows the swimming speed to be calculated as difference between subsequent bacteria positions.
+The tumbling time can be calculated as the time spent tumbling divided by the number of tumbling events. 
+Inspired by the work of \textit{Wong-Ng et al.} \cite{Wong2016} and \textit{B. Masson et al.} \cite{Masson:2011} we wrote an algorithm, implemented in \textit{MATLAB}, which detects such running/tumbling events (see Figure \ref{runtumbledetection}) which in turn were used to extract all the relevant biological information about bacteria motion from the tracked trajectories\footnote{Tumbles are associated to a decrease in advancing velocity and an abrupt change in the angular velocity (i.e. in the direction of the motion). Fixing a threshold on both advancing and angular velocities it is possible to identify running/tumbling and use them to computes the mean values $t_t$ and $v$ over all the trajectories of the experiment.}.
+    \begin{figure}[htp]
          \includegraphics[width=9.3cm,height=7cm]{./images/runtumble.png}
-        \caption{Trajectories}\label{fig:}
+        \caption{This figure shows the tracked trajectory of a single bacterium. Blue-yellow colors gradient identifies the velocity.
+         The red segments represent the identified tumbles .}
+        \label{runtumbledetection}
     \end{figure}
-Those events allows the swimming speed to be calculated as difference between subsequent bacteria positions. The tumbling time can be calculated as the time spent tumbling divided by the number of tumbling events. Inspired by the work of \textit{Wong-Ng et al.} \cite{Wong2016} we wrote an algorithm, implemented in \textit{MATLAB}, which detects such tumbling events. The algorithm considers only trajectories that last more than $M_d=5$s, then it smooths trajectories over a few point. 
-Tumbles are associated to a decrease in linear velocity and a sudden change of the angular velocity (direction of the motion). Thus analyzing trajectories and fixing a threshold on both linear and angular velocities the algorithm identifies tumbling events and then it computes the mean values $t_t$ and $v$ over all the trajectories of the experiment. 
 
-
-
-
-
+We found a mean swimming velocity of  \SI{18}{\micro\meter \per \second}, a mean run time (time spent swimming straight) of \SI{0.8}{\second} and a tumble time of \SI{0.18}{\second}. 
+All the found these values are in accordance with the results of \textit{Cisneros et al.} \cite{Cisneros:2011}.
 \section{Conclusion}
+ricordati di scriver rigurado gli sviluppi di una cosa parallela
+
 
 \section{blablabls}
-Quanti batteri mediamente ci sono? 
-
-
-spiega che i batteri si muovo in unoi spazio 3d e che il fuoco del microscopio è molto stretto (servono dati sul fuoco del microscopio)  che una volta che i batteri nuotano in direzione Y scompaiono dalle immagini. 
-Se una particella(cosi vengono chiamte nella descrizione dell'algoritmo al capitolo precedente) è "scompars" per un certo numero di frames, fino a quando la consideriamo candidabile per un eventuale match?
 
 Durante la validazione dei risultati è importante dire che i primi test sono stati effettuati utilizzando immagini  sintetiche di cluster non omogenei di pixel colorati su sfondo nero e fatti muovere secondo un certo movimento  (inventatene uno figo, circolare, pseudorandom blabla). 
 Mostra qualche risultato, ad esempio la velocità di movimento matcha. 
-
-scopo: inferire modelli matematici che descrivono 
-
-toglie i tumble e checcka speed del run
-come vengono checkati i tumble?
-18micrometri al secondo risultato
-tubling di 0.2 -> running 1-0.2 =0.8 sec
-in bio il dato è cvariabile perche va da 15 a 30 (dipende dalla ref) ma ha senso dal punto di vista bio
-va giustificato con delle referenza con i Bsaptisolis
-
-2) track analizzate msd analyzer
-
-variazione nel tempo del msd => legata al coeff di diffusione
- => legato a due cose : velocità e il tempo di tumble
- 23 con questo metodo. biologicamente sono buoni (18 e 23) sono compatibili con veliocità di sti batteri
- 
-quindi se con due modi diversi trovi risultati builogicamente buoni => tracking funge
-
-
-
-
-Come è stato validato il modello? (dovrebbe scriverlo alice)
-
-    \begin{figure}
+    \begin{figure}[h]
       \begin{center}
         \includegraphics[scale=0.5]{./images/result.png}
-        \caption{Trajectories}\label{fig:}
+        \caption{This figures shows the collective view of all the tracked bacteria tracjectories. A random color is associated to each trajectory.}\label{fig:}
         
       \end{center}
     \end{figure}
-
-
-
 
 
 % if have a single appendix:
@@ -724,9 +693,10 @@ Come è stato validato il modello? (dovrebbe scriverlo alice)
 
 % use section* for acknowledgement
 \section*{Acknowledgment}
-
-
 The authors would like to thank...
+istituto di bioningegneria di edi
+filippo melascina
+NVIDIS for the hardware
 
 
 % Can use something like this to put references on a page
@@ -762,7 +732,7 @@ The authors would like to thank...
 \begin{thebibliography}{1}
 
 \bibitem{Cho:1989}
-S. Cho, R. Haralick, and S. Yi, “Improvement of Kittler and Illingworth’s minimum error thresholding,” Pattern Recognit., vol. 22, no. 5, pp. 609– 617, 1989.
+S. Cho, R. Haralick, and S. Yi, ``Improvement of Kittler and Illingworth’s minimum error thresholding,'' Pattern Recognit., vol. 22, no. 5, pp. 609– 617, 1989.
 \bibitem{Shapiro:2002}
 Shapiro, Linda G, Stockman, George C. (2002). "Computer Vision". Prentice Hall. ISBN 0-13-030796-3
 
@@ -776,6 +746,7 @@ Bellman, R. E. Review: Eugene L. Lawler, Combinatorial optimization: networks an
  Bull. Amer. Math. Soc. 84 (1978)
 
 
+
 \bibitem{opencalurl}
 OPENCAL download page: \url{https://github.com/OpenCALTeam/opencal/releases}
 \bibitem{opencalmanual}
@@ -783,12 +754,18 @@ OPENCAL download page: \url{https://github.com/OpenCALTeam/opencal-user-guide}
 
 \bibitem{msdanalyzer}
 Nadine Tarantino, Jean-Yves Tinevez, Elizabeth Faris Crowell, Bertrand Boisson, Ricardo Henriques, Musa Mhlanga, Fabrice Agou, Alain Israël, and Emmanuel Laplantine. TNF and IL-1 exhibit distinct ubiquitin requirements for inducing NEMO-IKK supramolecular structures. J Cell Biol (2014) vol. 204 (2) pp. 231-45
+
 \bibitem{msdanalyzer:web}
 \url{http://tinevez.github.io/msdanalyzer/}
 
 \bibitem{Wong2016}
 Wong-Ng J, Melbinger A, Celani A, Vergassola M (2016) The Role of Adaptation in Bacterial Speed Races. PLoS Comput Biol 12(6): e1004974. doi: 10.1371/journal.pcbi.1004974
 
+\bibitem{Masson:2011}
+Noninvasive inference of the molecular chemotactic response using bacterial trajectories Jean-Baptiste Masson, Guillaume Voisinnea, Jerome Wong-Nga, Antonio Celania, and Massimo Vergassola, 2011
+
+\bibitem{Cisneros:2011}
+Cisneros, L. H., Kessler, J. O., Ganguly, S.,  Goldstein, R. E. (2011). Dynamics of swimming bacteria: Transition to directional order at high concentration. Physical Review E, 83(6), 061907.
 \end{thebibliography}
 
 % biography section
