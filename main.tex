@@ -312,7 +312,7 @@ Results show that the framework is able to reconstruct the trajectories in such 
 
 % Note that keywords are not normally used for peerreview papers.
 \begin{IEEEkeywords}
-IEEEtran, journal, \LaTeX, paper, template.
+cellular automata, bacteria tracking, image processing
 \end{IEEEkeywords}
 
 
@@ -648,21 +648,20 @@ The tumbling time can be calculated as the time spent tumbling divided by the nu
 Inspired by the work of \textit{Wong-Ng et al.} \cite{Wong2016} and \textit{B. Masson et al.} \cite{Masson:2011} we wrote an algorithm, implemented in \textit{MATLAB}, which detects such running/tumbling events (see Figure \ref{runtumbledetection}) which in turn were used to extract all the relevant biological information about bacteria motion from the tracked trajectories\footnote{Tumbles are associated to a decrease in advancing velocity and an abrupt change in the angular velocity (i.e. in the direction of the motion). Fixing a threshold on both advancing and angular velocities it is possible to identify running/tumbling and use them to computes the mean values $t_t$ and $v$ over all the trajectories of the experiment.}.
     \begin{figure}[htp]
          \includegraphics[width=9.3cm,height=7cm]{./images/runtumble.png}
-        \caption{This figure shows the tracked trajectory of a single bacterium. Blue-yellow colors gradient identifies the velocity.
-         The red segments represent the identified tumbles .}
+        \caption{This figure depicts the tracked trajectory of a single bacterium. Blue-yellow colors gradient shows the velocity. The red segments represent the identifies tumbles.}
         \label{runtumbledetection}
     \end{figure}
 
 We found a mean swimming velocity of  \SI{18}{\micro\meter \per \second}, a mean run time (time spent swimming straight) of \SI{0.8}{\second} and a tumble time of \SI{0.18}{\second}. 
 All the found these values are in accordance with the results of \textit{Cisneros et al.} \cite{Cisneros:2011}.
+
 \section{Conclusion}
-ricordati di scriver rigurado gli sviluppi di una cosa parallela
+This premiliary work we presented a an cellular automata based framework for tracking centroid-bounding box represented particles. 
+We also presented an application of the proposed framework on tracking the motion of \textit{B. subtilis} in a microfliudic device in order to retrieve the average swimming velocity, running and tumble times. The results are in accordance with \cite{Cisneros:2011}. 
+\subsection{Future works}
+Due to the possible large number of particles and frames involved in such analysis a parallel GPGPU+MPI version of the framework is being developed and it will be applied to the analisys of a much larger dataset to test its scalability and speedup.
+It is also important to note that under the assumption of associativity of the \textit{assignment operator} $\lozenge$ the tracking algorithm could be implemented using the design pattern of \textit{parallel reduction}.
 
-
-\section{blablabls}
-
-Durante la validazione dei risultati è importante dire che i primi test sono stati effettuati utilizzando immagini  sintetiche di cluster non omogenei di pixel colorati su sfondo nero e fatti muovere secondo un certo movimento  (inventatene uno figo, circolare, pseudorandom blabla). 
-Mostra qualche risultato, ad esempio la velocità di movimento matcha. 
     \begin{figure}[h]
       \begin{center}
         \includegraphics[scale=0.5]{./images/result.png}
@@ -693,10 +692,7 @@ Mostra qualche risultato, ad esempio la velocità di movimento matcha.
 
 % use section* for acknowledgement
 \section*{Acknowledgment}
-The authors would like to thank...
-istituto di bioningegneria di edi
-filippo melascina
-NVIDIS for the hardware
+The authors would like to thank NVIDIA for providing GPUs and Filippo Melascina from the University of Edinburgh, Institute of BioEngineering, UK who kindly gave access to the microscopy equipment.
 
 
 % Can use something like this to put references on a page
