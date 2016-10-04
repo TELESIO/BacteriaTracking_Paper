@@ -253,7 +253,7 @@
 % affiliations
 \author{\IEEEauthorblockN{Davide Spataro, Paola Arcuri, Alessio De Rango,\\ William Spataro
     and Donato D'Ambrosio}
-\IEEEauthorblockA{Department of Computer Science\\
+\IEEEauthorblockA{Department of Mathematics and Computer Science\\
 University of Calabria\\
 Rende, Italy\\
 Email: d.spataro@mat.unical.it}
@@ -304,16 +304,16 @@ Email: alicemari45@gmail.com }
 Particle tracking plays an important role in numerous fields of science for the investigation of the movement of sub-micron particles, micropsheres and molecules under microscopic observation.
 In this paper we present an algorithm for detecting and tracking particles based on geometrical difference evaluation and centroid displacement analysis to reconstruct the trajectories. 
 This method works for $n$-dimensional input data provided that particles are represented by at least a centroid space coordinate and a geometrical entity which describe their shape. 
-Since 2-D images are a common source of such data we also present framework for image-manipulation based on Extended Cellular Automata (XCA) paradigm.
+Since 2-D images are a common source of such data, we also present a framework for image-manipulation based on Extended Cellular Automata (XCA).
 We have applied and validated TraCCA in investigating the motility of \textit{B. subtilis.} injected in a microfluidic device using 4100 images taken at 100 frames per second. 
-Results show that the framework is able to reconstruct the trajectories  as computed motion parameters that are in accordance with the ones found in literature.
+Results show that the framework is able to reconstruct the trajectories as computed motion parameters that are in accordance with the ones found in literature. Eventually, a preliminary parallel version implemented on GPUs and distributed memory machines have produced promising scalability and speedup, proving that the methodology can be also applied for large datasets.  
 
 
 \end{abstract}
 
 % Note that keywords are not normally used for peerreview papers.
 \begin{IEEEkeywords}
-cellular automata, bacteria tracking, image processing
+cellular automata, tracking, image processing, bacteria motility
 \end{IEEEkeywords}
 
 
@@ -332,40 +332,40 @@ cellular automata, bacteria tracking, image processing
 \IEEEpeerreviewmaketitle
 
 \section{Introduction}
-Particle tracking plays an important role in numerous fields of science for investigating the movement of sub-micron particles, micro-spheres and molecules under microscopic observation.  Several studies employ time-lapse microscopy, especially in the field of biophysics, as a tool to gather data and retrieve single particle time trajectories. The researcher usually relies on manual o semi-manual/interactive software to study such properties. This approach is unfeasible when the number of cells involved in the analysis is high.
+Studying of the movement of sub-micron particles, micro-spheres and molecules under microscopic observation often requires their time trajectories from which important kinematic and dynamic properties can be computed. 
+Several studies employ time-lapse microscopy, especially in the field of biophysics, as a tool to gather data and retrieve single particle time trajectories. The researcher usually relies on manual or semi-manual/interactive software to study such properties. However, this approach is unfeasible when the number of cells involved in the analysis is high.
 
-In this paper we present an algorithm for detecting and tracking particles that is based on image processing techniques and to a shape difference and centroid displacement analysis to reconstruct the trajectories. 
+In this paper we present an algorithm for detecting and tracking particles that is based on image processing techniques and to shape difference and centroid displacement analysis to reconstruct the trajectories. 
 This method works for $n$-dimensional input data provided that particles are represented by at least a centroid space coordinate and a geometrical entity which describe its shape. 
-Since $2$D images are a common source of such data we also present framework for image-manipulation based on Extended Cellular Automata(XCA) paradigm .
+Since $2$D images are a common source of such data we also present framework for image-manipulation based on the Extended Cellular Automata(XCA) paradigm .
 
-We have applied and validated TraCCA in investigating the motility of \textit{B. subtilis.} injected in a micro-fluidic device using 4100 images taken at 100 frames per second. 
+TraCCA has been successfully applied for the investigation of the motility of \textit{B. subtilis.} injected in a micro-fluidic device using 4100 images taken at 100 frames per second, as reported in Section \ref{sect:bacteriaanalysis}.
+
+The paper is organized as follows: Sections  \ref{trackalgorithm} and \ref{manipulating} outline the proposed tracking algorithm and cellular automata based image processing framework, respectively; Section \ref{sect:bacteriaanalysis} shows a detailed application of TraCCA referred to a real case study regarding bacterial motility, while conclusions and possible future works are reported in Section \ref{conclusions}.
 
 
 
-\section{Tracking Algorithm}
-Objective of the tracking algorithm is to output a 
+\section{Tracking Algorithm}\label{trackalgorithm}
+The objective of the tracking algorithm is to produce a 
 set $ T_n = \{ t_i \}$  s.t.  $t_i=\{ c^i_k,c^i_{k+1},\ldots,c^i_l \} $ 
-of trajectories each described as a time-ordered list of positions  in space from a set of input 
+of trajectories each described as a time-ordered list of positions in space from a set of input 
 particles $P=P_1 \cup P_2 \cup \ldots \cup P_n$ and a function $\mathcal{D} :  P \times P \mapsto \mathbb{R}$, 
 the \textit{distance} function. $P_i = \{p^j_i \; | \; 1 \leq j\; \}$ indicates all particles at time $i$ and each particle $p_i^j$ is defined by a centroid position, and a bounding box which describes its geometrical properties.
-$\mathcal{D}(p,q)$ measures the likeliness that a particle $p$ has been transformed into $q$ as a result of the application a number of geometrical transformations such as translation, scaling, shearing or rotation (see Eq. \ref{sec:bacttracking}). 
+$\mathcal{D}(p,q)$ measures the likeliness that a particle $p$ has been transformed into $q$ as a result of the application of a number of geometrical transformations such as translation, scaling, shearing or rotation (see Eq. \ref{sec:bacttracking}). 
 Indexes $k$ and $l$, $k \leq l$ indicate the trajectory starting and ending time of the tracked movement respectively, and the length $l-k+1$ is its duration in time.
-Note that particles may appear or disappear at any time and hence $k\geq 0$ and $l \leq n$, moreover $|t_i| \leq l-k+1$ since a particle which has been successfully tracked
- from  $P_k$ to $P_{k^*} $ can disappear for a certain time and appears again in $P_{\bar{k}}$, $k \leq k^* \leq \bar{k}$. We only allows disappearing time $\bar{k}-k^* \leq \xi$ where $\xi \geq 0$ is a parameter of the algorithm. 
+Note that particles may appear or disappear at any time and hence $k\geq 0$ and $l \leq n$. Moreover, $|t_i| \leq l-k+1$ since a particle which has been successfully tracked
+ from  $P_k$ to $P_{k^*} $ can disappear for a certain time and may appear again in $P_{\bar{k}}$, $k \leq k^* \leq \bar{k}$. We only allow disappearing time $\bar{k}-k^* \leq \xi$ where $\xi \geq 0$ is a parameter of the algorithm. 
 Each trajectory  $t_*=\{ c^*_k,c^*_{k+1},\ldots,c^*_l \} $ is composed by  positions of particles $p^{j_1}_k,p^{j_2}_{k+1},\ldots,p^{j_*}_l$ at different times. 
 This means that, for our purpose, particle $p^{j_1}_k$ at frame $k$ has moved from $c^*_k$ to location of particle $p^{j_2}_{k+1}$,$c^*_{k+1}$ at time ${k+1}$ and to location of $p^{j_*}_{l}$, $c^*_l$ at time $l$. 
 
-As an example, consider a human tracking system where each $P_i$ could correspond to all the detected bodies in a  video frame $i$ and the distance function is a linear combination of the euclidean distance between two detected bodies centroids  and pixel-by-pixel difference in colors of all the pixels within their bounding boxes. In this context it would make sense to consider a not null disappearing time since is not uncommon for the human detection modules (which is in charge of producing the centroids and bounding box from the images) stopping to recognize a specific target only for a limited number of frames. 
+As an example, let us consider a human tracking system where each $P_i$ could correspond to all the detected bodies in a  video frame $i$ and the distance function a linear combination of the euclidean distance between two detected bodies centroids  and pixel-by-pixel difference in colors of all the pixels within their bounding boxes. In this context, it would make sense to consider a not null disappearing time since it is not uncommon for the human detection module (which is in charge of producing the centroids and bounding box from the images) to skip recognizing a specific target only for a limited number of frames. 
 
 
+In order to construct the trajectories, the algorithm works sequentially from frame $1$ to $n$ processing, at each step, two subsets of particles, $M_i$ and $P_{i}$, where $M_i$ contains all the corresponding trajectories ending particles $p^{j}_l$ that can still be expanded, i.e. $i-l \leq \xi$ .
+Informally, the algorithm tries to augment an element in $M_i$ using a particle in $P_i$ making sure at most one particle is added to it, the same particle does not augment two different trajectories and the augmenting is performed s.t. the distance function is minimized.
 
-
-
-In order to construct the trajectories the algorithm works sequentially from frame $1$ to $n$ processing, at each step, two subsets of particles, $M_i$ and $P_{i}$, where $M_i$ contains all the corresponding trajectories ending particles $p^{j}_l$ that can still be expanded i.e. $i-l \leq \xi$ .
-Informally it tries to augment an element in $M_i$ using a particle in $P_i$ making sure at most one particle is added to it, the same particle does not augments two different trajectories and the augmenting is performed s.t. the distance function is minimized.
-
-Since at each step of the process we try to assign to an element of $M_i$ one of $P_i$ the algorithm can be thought to be similar to the \textit{assignment problem} \cite{bellmann1978} and more specifically, it consists in finding a minimum weight matching (not necessarily perfect) in  a weighted bipartite directed graph $G=(V,E)$ where $V={M_i} \cup P_i$ is the set of nodes and ${M_i}, P_i$ are the two partitions, $E = {M_i} \times P_i$ s.t. $e \in E, \mathcal{D}(e) \in \mathbb{R}$ is the weight of the edge.
-A valid matching $S \subseteq E$ must satisfy the followings: 
+Since at each step of the process a possible assignment between an element of $M_i$ and one of $P_i$ is sought, the algorithm can be thought to be similar to the \textit{assignment problem} \cite{bellmann1978} and more specifically, it consists in finding a minimum weight matching (not necessarily perfect) in  a weighted bipartite directed graph $G=(V,E)$ where $V={M_i} \cup P_i$ is the set of nodes and ${M_i}, P_i$ are the two partitions, $E = {M_i} \times P_i$ s.t. $e \in E, \mathcal{D}(e) \in \mathbb{R}$ is the weight of the edge.
+A valid matching $S \subseteq E$ must satisfy the following: 
 \[ \forall (u,v) \in S 
 \left\{
   \begin{array}{lr}
@@ -376,15 +376,15 @@ A valid matching $S \subseteq E$ must satisfy the followings:
 \right.
 \]
 
-If we denote the matching operator  as the following recurrence relation $  M_i \lozenge P_{i+1} = (T_{i+1},M_{i+1}) $, $M_0=P_0$ then the  tracking algorithm can be summarized as $(T_n,M_n) = M_{n-1} \lozenge P_{n}=(((P_0 \lozenge P_1)\lozenge P_2) \lozenge \ldots \lozenge P_n)$.
+If we denote the matching operator  as the following recurrence relation $  M_i \lozenge P_{i+1} = (T_{i+1},M_{i+1}) $, $M_0=P_0$, then the  tracking algorithm can be summarized as $(T_n,M_n) = M_{n-1} \lozenge P_{n}=(((P_0 \lozenge P_1)\lozenge P_2) \lozenge \ldots \lozenge P_n)$.
 
-After each $\lozenge$ application a particle $p \in {M_i} \cup P_i $ may remain  unmatched; If this happens then we can have two cases (see figure \ref{match}):
+After each $\lozenge$ application, a particle $p^* \in {M_i} \cup P_i $ may remain  unmatched; if this happens, then we can have two cases (see figure \ref{match}):
 \begin{enumerate}
- \item if $p \in M_{i}$ the disappearing time counter $u_p$ for $p$ is updated and if $u_p > \xi$, $p$ is not included in $M_{i+1}$ and the corresponding tracked trajectory is flushed into $T_i$, otherwise it is retained. This handles the case when particles may disappear from the dataset for a number of time steps and  appear again. The algorithm can still track such particles.
- \item if $p \in P_i$ it corresponds to a newly appeared particle which is then inserted into $M_{i+1}$. 
+ \item if $p^* \in M_{i}$, the disappearing time counter $u_p$ for $p$ is updated and if $u_p > \xi$, $p$ is not included in $M_{i+1}$ and the corresponding tracked trajectory is flushed into $T_i$, otherwise it is retained. This handles the case when particles may disappear from the dataset for a number of time steps and appear again. 
+ \item if $p \in P_i$, it corresponds to a newly appeared particle which is then inserted into $M_{i+1}$. 
 \end{enumerate}
  
-The pseudo-code \ref{alg:matching} shows how the matching procedure is implemented. Note that the \texttt{NEIGH} procedure filters the possible candidates for a particle only to those which the euclidean spatial distance is less than a threshold parameter. In many real life applications particle displacement between two subsequent time-steps are small so it would be useless trying to match a particle at time $i$ with one at time $i+1$ which are spatially far.
+The pseudo-code reported in Algorithm \ref{matching} shows how the matching procedure is implemented. Note that the \texttt{NEIGH} procedure filters the possible candidates for a particle only to those which the euclidean spatial distance is less than a threshold parameter. In many real life applications particle displacement between two subsequent time-steps are small, so it would be useless trying to match a particle at time $i$ with one at time $i+1$ which are spatially far apart.
 \begin{algorithm}[h]
     \SetKwInOut{Input}{Input}
     \SetKwInOut{Output}{Output}
@@ -453,8 +453,9 @@ The pseudo-code \ref{alg:matching} shows how the matching procedure is implement
     
     
       
- \label{alg:matching}
+ 
     \caption{ssdsdsvc}
+		\label{matching}
 \end{algorithm}
 
 
@@ -531,13 +532,13 @@ The pseudo-code \ref{alg:matching} shows how the matching procedure is implement
 
 
 \end{tikzpicture}
-\caption{This figuire depicts the assignment problem. Red arrows highlight the solution. This means that the trajectory $t_*=p^s_a \leadsto p^i_1$  is lengthened by $p^{i+1}_m$ becoming $t=p^s_a \leadsto p^i_1 \to p^{i+1}_m$. Unmatched particle $p^{i+1}_k$ causes a  trajectory of size one to be created while trajectory of $p^{i}_l$ may be finalized.} \label{match}
+\caption{This figure depicts the assignment problem. Red arrows highlight the solution. This means that the trajectory $t_*=p^s_a \leadsto p^i_1$  is lengthened by $p^{i+1}_m$ becoming $t=p^s_a \leadsto p^i_1 \to p^{i+1}_m$. Unmatched particle $p^{i+1}_k$ causes a  trajectory of size one to be created while trajectory of $p^{i}_l$ may be finalized.} \label{match}
 \end{figure}
 
 
 
-\section{Manipulating images using XCA}
-In this section we present a Cellular Automata based framework for manipulating images that allows seemless parallel filters application.
+\section{Manipulating images using XCA}\label{manipulating}
+In this section we present a Cellular Automata based framework for manipulating images that allows seamless parallel filters application.
 \input{CA.tex}
 
 \subsection{Definition and Usage}
@@ -666,7 +667,7 @@ Inspired by the work of \textit{Wong-Ng et al.} \cite{Wong2016} and \textit{B. M
 We found a mean swimming velocity of  \SI{18}{\micro\meter \per \second}, a mean run time (time spent swimming straight) of \SI{0.8}{\second} and a tumble time of \SI{0.18}{\second}. 
 All these values are in accordance with the results of \textit{Cisneros et al.} \cite{Cisneros:2011}.
 
-\section{Conclusion}
+\section{Conclusion}\label{conclusions}
 This premiliary work we presented a an cellular automata based framework for tracking centroid-bounding box represented particles. 
 We also presented an application of the proposed framework on tracking the motion of \textit{B. subtilis} in a microfliudic device in order to retrieve the average swimming velocity, running and tumble times. The results are in accordance with \cite{Cisneros:2011}. 
 \subsection{Future works}
@@ -703,7 +704,7 @@ It is also important to note that under the assumption of associativity of the \
 
 % use section* for acknowledgement
 \section*{Acknowledgment}
-The authors would like to thank NVIDIA for providing GPUs and Filippo Melascina from the University of Edinburgh, Institute of BioEngineering, UK who kindly gave access to the microscopy equipment.
+The authors would like to thank NVIDIA for providing GPUs and Prof. Filippo Melascina from the University of Edinburgh, Institute of BioEngineering, UK who kindly gave access to the microscopy equipment.
 
 
 % Can use something like this to put references on a page
@@ -773,6 +774,17 @@ Noninvasive inference of the molecular chemotactic response using bacterial traj
 
 \bibitem{Cisneros:2011}
 Cisneros, L. H., Kessler, J. O., Ganguly, S.,  Goldstein, R. E. (2011). Dynamics of swimming bacteria: Transition to directional order at high concentration. Physical Review E, 83(6), 061907.
+
+\bibitem{toti1999}
+Salvatore Di Gregorio, Roberto Serra, An empirical method for modelling and simulating some complex macroscopic phenomena by cellular automata, Future Generation Computer Systems, Volume 16, Issues 2–3, December 1999, pp. 259-271.
+
+\bibitem{spataro2014}
+Spataro, Davide, et al. "The new SCIARA-fv3 numerical model and acceleration by GPGPU strategies." International Journal of High Performance Computing Applications (2015)
+
+
+\bibitem{Neumann1966}
+John Von Neumann. 1966. Theory of Self-Reproducing Automata. Arthur W. Burks (Ed.). University of Illinois Press, Champaign, IL, USA
+
 \end{thebibliography}
 
 % biography section
