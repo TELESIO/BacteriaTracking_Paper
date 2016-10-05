@@ -366,7 +366,8 @@ Informally, the algorithm tries to augment an element in $M_i$ using a particle 
 
 Since at each step of the process a possible assignment between an element of $M_i$ and one of $P_i$ is sought, the algorithm can be thought to be similar to the \textit{assignment problem} \cite{bellmann1978} and more specifically, it consists in finding a minimum weight matching (not necessarily perfect) in  a weighted bipartite directed graph $G=(V,E)$ where $V={M_i} \cup P_i$ is the set of nodes and ${M_i}, P_i$ are the two partitions, $E = {M_i} \times P_i$ s.t. $e \in E, \mathcal{D}(e) \in \mathbb{R}$ is the weight of the edge.
 A valid matching $S \subseteq E$ must satisfy the following: 
-\[ \forall (u,v) \in S 
+\begin{equation}
+\forall (u,v) \in S 
 \left\{
   \begin{array}{lr}
    (w,x) \in S,\; v=x\Longleftrightarrow u=w\\
@@ -374,14 +375,14 @@ A valid matching $S \subseteq E$ must satisfy the following:
     \nexists \: (w,v) \in E \: \mbox{s.t.} \: \mathcal{D}(w,v) < \mathcal{D}(u,v)
   \end{array}
 \right.
-\]
+\label{matchConstraints}
+\end{equation}
 
 If we denote the matching operator  as the following recurrence relation $  M_i \lozenge P_{i+1} = (T_{i+1},M_{i+1}) $, $M_0=P_0$, then the  tracking algorithm can be summarized as $(T_n,M_n) = M_{n-1} \lozenge P_{n}=(((P_0 \lozenge P_1)\lozenge P_2) \lozenge \ldots \lozenge P_n)$.
-
-After each $\lozenge$ application, a particle $p^* \in {M_i} \cup P_i $ may remain  unmatched; if this happens, then we can have two cases (see figure \ref{match}):
+If after the $\lozenge$ application a particle $p^* \in {M_i} \cup P_i $ remains  unmatched\footnote{$\nexists \;(u,v) \in S $ s.t. $  u=p^* \vee v=p^*$ (cf. Equation \ref{matchConstraints})}, two cases have to be considered (see Figure \ref{match}):
 \begin{enumerate}
- \item if $p^* \in M_{i}$, the disappearing time counter $u_p$ for $p$ is updated and if $u_p > \xi$, $p$ is not included in $M_{i+1}$ and the corresponding tracked trajectory is flushed into $T_i$, otherwise it is retained. This handles the case when particles may disappear from the dataset for a number of time steps and appear again. 
- \item if $p \in P_i$, it corresponds to a newly appeared particle which is then inserted into $M_{i+1}$. 
+ \item if $p^* \in M_{i}$, the disappearing time counter $u_{p^*}$ for $p^*$ is updated and if $u_{p^*} > \xi$, $p^*$ is not included in $M_{i+1}$ and the corresponding tracked trajectory is flushed into $T_i$, otherwise it is retained. This handles the case when particles may disappear from the dataset for a number of time steps and appear again. 
+ \item if $p^* \in P_i$, it corresponds to a newly appeared particle which is then inserted into $M_{i+1}$. 
 \end{enumerate}
  
 The pseudo-code reported in Algorithm \ref{matching} shows how the matching procedure is implemented. Note that the \texttt{NEIGH} procedure filters the possible candidates for a particle only to those which the euclidean spatial distance is less than a threshold parameter. In many real life applications particle displacement between two subsequent time-steps are small, so it would be useless trying to match a particle at time $i$ with one at time $i+1$ which are spatially far apart.
@@ -467,7 +468,7 @@ The pseudo-code reported in Algorithm \ref{matching} shows how the matching proc
   every node/.style={draw,circle},
   fsnode/.style={fill=gray!30},
   ssnode/.style={fill=gray!90},
-  every fit/.style={ellipse,inner sep=-2pt,text width=2cm},
+  every fit/.style={ellipse,inner sep=-2pt,text width=cm},
   ->,shorten >= 3pt,shorten <= 3pt
 ]
 
@@ -506,33 +507,39 @@ The pseudo-code reported in Algorithm \ref{matching} shows how the matching proc
 \node [mygreen,draw=none] {};
   \begin{scope}[every edge/.style={draw,thin}]
 % the edges
-\draw (f0) edge[red, thick]  (s3);
+\draw (f0) edge[red, thick, dashed]  (s3);
 \foreach \i in {0}
 	\foreach \j in {0,1,2}
 		\draw (f\i) edge  (s\j);
 
 
-\draw (f1) edge[red, thick]  (s0);
+\draw (f1) edge[red,thick, dashed]  (s0);
 \foreach \i in {1}
 	\foreach \j in {1,2,3}
 		\draw (f\i) edge  (s\j);
 
-\draw (f2) edge[red, thick]  (s1);
+\draw (f2) edge[red, thick,dashed]  (s1);
 \foreach \i in {2}
 	\foreach \j in {0,2,3}
 		\draw (f\i) edge  (s\j);
 
-\draw (f3) edge[red, thick]  (s2);
+\draw (f3) edge[red, thick,dashed]  (s2);
 \foreach \i in {3}
 	\foreach \j in {1,3,0}
 		\draw (f\i) edge  (s\j);
+		
+
+
 
    \end{scope}
 
 
 
 \end{tikzpicture}
-\caption{This figure depicts the assignment problem. Red arrows highlight the solution. This means that the trajectory $t_*=p^s_a \leadsto p^i_1$  is lengthened by $p^{i+1}_m$ becoming $t=p^s_a \leadsto p^i_1 \to p^{i+1}_m$. Unmatched particle $p^{i+1}_k$ causes a  trajectory of size one to be created while trajectory of $p^{i}_l$ may be finalized.} \label{match}
+\caption{An application of the $\lozenge$ operator referred to a frame $P_{i+1}$ of $m$ particles. Dashed red arrows highlight the solution $S$.
+For instance, the trajectory $t_*=p^s_a \leadsto p^i_1$  is lengthened by $p^{i+1}_m$ becoming $t=p^s_a \leadsto p^i_1 \to p^{i+1}_m$.
+Unmatching (no incident dashed red arrow are present) particle $p^{i+1}_k$  causes a  trajectory of length one to be created, while unmatching particle $p^{i}_l$ causes its disappearing time counter  to be updated and the corrensponding trajectory to be possibly finalized (if $u_{p^{i}_l} > \xi$). 
+Note that, for the sake clarity, arrows for the unmatched  nodes are omitted.} \label{match}
 \end{figure}
 
 
@@ -542,37 +549,57 @@ In this section we present a Cellular Automata based framework for manipulating 
 \input{CA.tex}
 
 \subsection{Definition and Usage}
-The framework is defined as a 7-tuple $ A = \langle R,X,Q,P,\sigma,\Gamma,\gamma \rangle$ where $R$ is a finite discrete $2$-dimensional space, $\Gamma=R$ is the region over the global operation are applied, $X=X(x_0,y_0)=\{(x,y): \left| x-x_0\right| \leq r \wedge \left| y-y_0\right| \leq r\} $ defines the \textit{Moore}'s neighborhood relationship of radius $r$, $P=\emptyset$, $\psi$ is the initialization function, $\sigma=\{\sigma_i:Q^{|X|} \mapsto Q\}$ and   $\gamma= \{\gamma_i:Q^{|\Gamma|} \rightarrow Q^{|\Gamma|}\} $ are the set of  elementary processes non-local functions, respectively.
+The XCA adopted for manipulating images is defined as a $7$-tuple $ IFCA = \langle R,X,Q,P,\sigma,\Gamma,\gamma \rangle$ where:
+
+    \begin{itemize}
+
+    \item $R$ is the $2$-dimensional cellular space.
+
+    \item $\Gamma \subseteq R$ is the region over the global operation are applied
+
+    \item $X=X(x_0,y_0)=\{(x,y): \left| x-x_0\right| \leq r \wedge \left| y-y_0\right| \leq r\} $ defines the \textit{Moore}'s neighborhood relationship of radius $r$
+
+    \item $Q = Q_r \times Q_g \times Q_b \times Q_a$ representing the pixel color channels in the \texttt{RGBA} space.
+
+    \item $P$ is the set of global parameters
+
+    \item $\psi$ is the initialization function (which is in charge of reading images from files and converting them to substates).
+      
+    \item $\sigma=\{\sigma_i:Q^{|X|} \mapsto Q\}$ is the set of image convolutional filters (corresponding to XCA elementary processes)  
+
+    \item $\gamma= \{\gamma_i:Q^{|\Gamma|} \rightarrow Q^{|\Gamma|}\} $ is the set of non-local filters (the XCA global functions).
+
+    \end{itemize}
     
-In order to take advantage of the intrinsic parallel nature of CAs all the image manipulation procedures were implemented augmenting an existing CA library, opencal\cite{dambrosio:2016} \cite{opencalurl} \cite{opencalmanual} which has  empowered  a set of procedures that allows seemless input/ouput and filtering.
-More specifically each image is represented as an automata which the only existing substate represents the color of the pixel and filters are implemented as a chain of elementary processes (see listing \ref{list:imgman}).
+In order to take advantage of the intrinsic parallel nature of CA, \texttt{IFCA} is implemented augmenting an existing CA library, \texttt{\textbf{OpenCAL}} \cite{opencalurl} \cite{opencalmanual} which is empowered  with a set of procedures that allows seamless input/output and image convolution.
+More specifically each image is represented as an cellular automaton whose substates represent the color of the pixel and filters implemented as elementary processes composition (see listing \ref{list:imgman}).
 
-\begin{framed}
-\begin{lstlisting}[language=C++,caption=Example of usage of the Image processing XCA engine. A model and a CA runtime are created. The raw image is then read into the substate. Elementary processes corrensponding to the operations to be performed on the image are set and the runtime is launched. ,label=list:imgman]	
+\lstset{
+frame=single,
+numberstyle=\ttfamily\footnotesize,
+numbers=right
+}
+\begin{lstlisting}[language=C++,caption={Example of usage of the IFCA XCA engine. Lines 1-5 create a model and runtime for an image of size $IMG\_SIZE$ and dimension $DIM$. Lines 7 loads the image into the substate which, for the sake of brevity, is unique since the input image is assumed to be single channel. Lines 9-10 show the creation of two user defined filters and Lines 11-12 load them into the engine. The order in which they appear in the code specifies the order of execution that is triggered at line 14.} ,label=list:imgman]	
 //Model and CA engine
-std::array<uint, 2> coords = { 512,512 }
-opencal::CALMooreNeighborhood<DIMENSION,MOORERADIUS> neighbor;
-MODELTYPE calmodel(coords,
-                &neighbor,
-                CAL_SPACE_FLAT,
-                CAL_NO_OPT);
-CALRun calrun (&calmodel, 1, steps, CAL_UPDATE_IMPLICIT); 
-CALSUBSTATE* bgr = calmodel.addSubstate<PIXELTYPE>();
+CALMooreNeighborhood<DIM,RADIUS> neighbor;
+MODELTYPE calmodel(IMG_SIZE,&neighbor,SPACE_FLAT);
+CALRun calrun(&calmodel, 1, STEPS, UPDATE_IMPLICIT); 
+CALSUBSTATE* bgr=calmodel.addSubstate<PIXELTYPE>();
 //Image loading
-bgr->loadSubstate(*(new std::function(loadImage<PIXELTYPE>)), "image_path");
-
+bgr->loadSubstate(*(new std::function(loadImage<PIXELTYPE>)), "image.tiff");
 //Image Filters Creations
-ContrastStretchingFilter <2,decltype(neighbor),COORD_TYPE,PIXELTYPE>contrastStretchingFilter(bgr, 1285, 1542, 0, 65535,1.0);
-ThresholdFilter<2,decltype(neighbor),COORD_TYPE,vec1s> thresholdFilter (bgr,0,61680,0,65535);
-
-calmodel.addElementaryProcess(&contrastStretchingFilter);
-calmodel.addElementaryProcess(&thresholdFilter);
+ContrastStrchFlt<...>csf(bgr,1285,1542,0,65535,1);
+ThresholdFlt<...> tf (bgr,0,61680,0,65535);
+calmodel.addElementaryProcess(&cst);
+calmodel.addElementaryProcess(&tf);
+//Trigger execution
 calrun->run();
 \end{lstlisting}
-\end{framed}
-The framework is extensible as it allows the addition of filters to the already existing ones by only specifying the local pixel transformations to be applied or, in case of a convolutional filter the appropriate kernel.
-Using this approach we can take advantage of any library parallelization available to speed up the image processing step (opencal comes with different parallelization strategies and support for heterogeneous acceleration) without changing the host code. 
-This can be extremely helpful in such cases where the size of the images is large enough to make sequential processing  be a bottleneck.
+
+\texttt{IFCA} is extensible as it allows the application of user-defined filters by only specifying the pixel transformation rules (or kernels in case of convolutional ones). 
+Filters are then executed by the \texttt{IFCA} engine which comes with two parallel (OpenMP and OpenCL)  and a serial implementations.
+The parallel execution is completely transparent and automatic and may be extremely useful in such cases where the size of the image is large or filters are particularly computationally demanding.
+
 
 
 
@@ -605,46 +632,48 @@ This information is important in studying the strategy they adopt to reach a sou
 In this work we used \textit{B. subtilis} strain \texttt{OI1085} for the tracking experiment.
 Cells were taken from frozen stock, resuspended in CAM (Cap Assay Minimal) and shaken  (\SI{37}{\degree}, 100 rpm) until the optical density $OD600=0.3$ was reached; we then diluted the suspension 1:10 in CAM.
 The bacterial suspension was injected in a micro-fluidic device.
-The micro-fluidic device is a simple device made by \textit{PDMS} and glass, composed of three parallel channels (height 100 um).
-In the central channel ( \SI{600}{\micro\meter} wide) bacteria were hosted and observed.
+The micro-fluidic device is a simple device made by \textit{PDMS} and glass, composed of three parallel channels (height  \SI{100}{\micro\meter}).
+In the central channel (\SI{600}{\micro\meter} wide) bacteria were hosted and observed.
 Two  walls of \textit{PDMS} (\SI{200}{\micro\metre}) separate the central channel from the left and right channels were oxygen was flown in order to reach a concentration of oxygen closed to 100\% in the central channel.
 10 minutes after the injection of bacterial suspension a video was acquired at 100 frames per second for \SI{41}{\second}  (\#4100 frames). All images were acquired through a 10$\times$ phase contrast objective (\textit{Nikon} microscope), using binning $2 \times 2$.
 All images are $512 \times 512$ pixels and have been exported in $16$-bit grayscale \texttt{TIFF} image format.
-
-
-
 
 \subsection{Bacteria Segmentation}
 
 The \textit{B. subtilis} cells typically have a large range of motion patterns and the cell soma generally appears as a dark area surrounded with a white halo.
 Colors can be inverted and the cell may appear white when it  moves out of focus sufficiently (see Figure \ref{contrast}).
-In order to automatically detect \textit{subtilis} cells in each frame, it is possible to use a histogram-based thresholding method as suggested in \cite{Cho:1989}.
+In order to automatically detect \textit{subtilis} cells, it is possible to use a histogram-based thresholding method as suggested in \cite{Cho:1989}.
 A key step of tracking bacteria is to individuate first, and then to label and describe each of the bacteria present in the images.
-In order to do so a segmentation preprocessing phase is performed on all the images. 
-Segmentation  is carried out by means of a threshold method \cite{Shapiro:2002} which produces a bi-partition of the pixel based on the color intensity. The value of pixel $(x,y)$ in image $g$ is given by the following, where $P$ is a predicate and f is the original image:
-${g(x,y) = \begin{cases} 1, & \mbox{if } P(f(x,y),T) \\ 0, & \mbox{otherwise }\end{cases}}$.
-One drawback of using threshold method is that pixel color intensity is the only property being considerend by the bi-partition process, not any relationships between the pixels. This can easily lead to binary regions where pixels are not contiguous or to miss or include relevant or unwanted pixels respectively.
-These effects can get worse as the noise increases. For the problem at hand, however, the threshold method works well because after the application of a \texttt{contrast stretch filter} the analysed images presents high contrasts between the background and cells soma (see figure \ref{contrast}).
-Contrast stretch filter  stretches or scales the range of pixel values between an upper and lower limit.
-Pixel values that are above or below this range are saturated to the upper or lower limit values respectively, while pixels that lies in the interval are scaled according to the following formula: 
+For this purpose,  a segmentation preprocessing phase is performed on all the images. 
+Segmentation  is carried out by means of a threshold method \cite{Shapiro:2002} which produces a bipartition of pixels based on the color intensity. The value of pixel $(x,y)$ in image $g$ is given by the following, where $P$ is a predicate and $f$ is the original image:
+\[{g(x,y) = \begin{cases} 1, & \mbox{if } P(f(x,y),T) \\ 0, & \mbox{otherwise }\end{cases}}\]
+As a consequence, a drawback of using the threshold method is that, among all inter-pixels relationships, color intensity difference is the only involved by the bi-partition process.
+This can easily lead to binary regions where pixels are not contiguous or to miss or include relevant or unwanted pixels respectively, with these effects getting worse as the noise increases.
+In the considered case, however, the threshold method works well because after the application of the \texttt{contrast stretch filter} the analysed images present high contrast between the background and cells soma (see Figure \ref{contrast}), since the filter stretches or scales the range of pixel values between an upper and lower limit.
+More specifically, color values that are above or below this range are saturated to the upper or lower limit values respectively, while values that lay in the interval are scaled according to the following formula: 
 \[{g(x,y) = \begin{cases} L_o & \mbox{if } f(x,y) < L_i \\  H_o & \mbox{if } f(x,y) < H_i\\ L_o + (f(x,y)-L_i)\frac{H_o-L_o}{H_i-L_i} & \mbox{if } L_i \leq f(x,y) \leq H_i\end{cases}}\] where  $[L_i,H_i]$ defines the interval in the original image which is linearly scaled into the interval $[L_o,H_o]$.
 
-All the images go through a noise reduction stage which employs a combinations of \textit{gaussian}, \textit{laplacian} and \textit{blurring} filters \cite{Deng:1993}.
-Values parameters used in the Contrast Stretching and Threshold filters are dataset dependent and need to be provided upfront. The initial range of colors is affected by optical conditions at the time of the experiment such as lenses, luminosity etc.
-Once the best set of parameters for one image are found, they can be used throughout the whole dataset since all images are taken under the same conditions.
+Eventually, all the images go through a noise reduction stage which employs a combinations of \textit{gaussian}, \textit{laplacian} and \textit{blurring} filters \cite{Deng:1993}.
+It is worth to note that filters parameters are dataset dependent and the best set of values experimentally determined. 
+
+
 
 
 \subsection{Bacteria Tracking}
 
-Binary images are then used to extract the relevant information for each of the segmented bacteria. This is done by interpreting each image as a graph whose nodes are pixels and an arc $(i,j)$ exists if pixels $i$ and $j$ are set and neighbors (according to \textit{Moore}'s relationship, see section \ref{sec:CA}).
-Bacteria correspond then to a connected component that are easily individuated by using an elementary processes which triggers a DFS visit from each set pixel. Once all pixels that make up the cell soma are individuated a unique ID $id_i$ that  identifies the bacterium uniquely, a centroid $c_i$ and a bounding box $s_i$ which describe describes the location, the shape and the area respectively are computed for each bacterium $i$. \texttt{CGAL} \cite{CGAL} is used to create and manipulate any geometrical entities. All the bacteria whose extension is less than $M_e = 2$\textit{px} are ignored and no further considered.
+Binary images are then used to extract the relevant information (shape and centroid) for each of the segmented bacteria.
+This is done by interpreting each image as a graph whose nodes are pixels and arc $(i,j)$ exists if pixels $i$ and $j$ are neighbors (according to \textit{Moore}'s relationship, see section \ref{sec:CA}).
+A bacterium corresponds to a connected component that can be easily individuated by using the DFS visiting algorithm.
+Once all pixels that make up the cell soma are individuated, a unique \textit{ID} $id_i$ which identifies the bacterium uniquely, a centroid $c_i$ and a bounding box $s_i$ which describe describes the location, the shape and the area, respectively, are computed for each bacterium $i$. All the bacteria whose extension is less than $M_e = 2$\textit{px} are ignored and no further considered.
+The creation and manipulation of all the geometrical entities involved in this latter phase are carried out by means of the computational geometry library \texttt{CGAL}  \cite{CGAL}.
 
-Weight function is a linear combination of the centroids distance and shapes difference 
+In order for the application of the algorithm described in Section \ref{trackalgorithm}, a distance function is required.
+Among possible functions, a linear combination of the centroids displacement and shapes difference was adopted:
 \begin{equation}
 \label{sec:bacttracking}
-W(c_i,c_j) = a \sqrt{(x_{c_i} - x_{c_j})^2 + (y_{c_i}-y_{c_j})^2} + b |S_i \cap S_j|
+D(c_i,c_j) = a \sqrt{(x_{c_i} - x_{c_j})^2 + (y_{c_i}-y_{c_j})^2} + b |S_i \cap S_j|
 \end{equation}
-where $S_i$ and $S_j$ are the sets of pixels within the boundaries of the bacteria's  bounding box.
+where $S_i$ and $S_j$ are the sets of pixels within the boundaries of the bacteria's  bounding box. Best values of weights $a$ and $b$ were experimentally determined in being $0.6$ and $0.4$ respectively.
 
 
 
@@ -653,19 +682,17 @@ where $S_i$ and $S_j$ are the sets of pixels within the boundaries of the bacter
 
 \section{Analysis and Validation}
 Starting from the relationship $D_b=  \frac{v^2 t_t}{2}$  \cite{Berg:1993} that links the diffusion coefficient to both swim velocity ($v$) and tumbling time ($tt$), 
-we have separated each trajectory into running and tumbling events \footnote{An additional validation has been performed, which, for the sake of brevity is only outlined here, uses \textit{Mean Square Displacement} (\texttt{MSD}) in time and considering the following relationship $MSD(t)=\frac{1}{2}\frac{v^2 t_R^2}{2t/t_R +e^{\frac{-2t}{t_R}-1}}$ \cite{Howse:2007} where $v$ is the swimming speed, $t_R$ is the timescale associated to rotational diffusion that is $t_R=2t_t$, it is possible to obtain $t_R $ and $v$ via fitting. $t_t$ and $v$ are then used to compute $D_b$}. 
-
-Those events allow the swimming speed to be calculated as difference between subsequent bacteria positions.
-The tumbling time can be calculated as the time spent tumbling divided by the number of tumbling events. 
-Inspired by the work of \textit{Wong-Ng et al.} \cite{Wong2016} and \textit{B. Masson et al.} \cite{Masson:2011} we wrote an algorithm, implemented in \textit{MATLAB}, which detects such running/tumbling events (see Figure \ref{runtumbledetection}) which in turn were used to extract all the relevant biological information about bacteria motion from the tracked trajectories\footnote{Tumbles are associated to a decrease in advancing velocity and an abrupt change in the angular velocity (i.e. in the direction of the motion). Fixing a threshold on both advancing and angular velocities it is possible to identify running/tumbling and use them to computes the mean values $t_t$ and $v$ over all the trajectories of the experiment.}.
+we have partitioned each trajectory into running and tumbling events. 
+These events allow the swimming speed to be calculated as difference between subsequent bacteria positions and average tumbling time as the overall time spent tumbling over by the number of tumbling events. 
+Inspired by the work of \textit{Wong-Ng et al.} \cite{Wong2016} and \textit{B. Masson et al.} \cite{Masson:2011} an algorithm, implemented in \textit{MATLAB}, was adopted for detecting such running/tumbling events (see Figure \ref{runtumbledetection})  which in turn were used to extract all the relevant bacterial motility parameter from the tracked trajectories\footnote{Tumbles are associated to a decrease in advancing velocity and an abrupt change in the angular velocity (i.e. in the direction of the motion). Fixing a threshold on both advancing and angular velocities it is possible to identify running/tumbling and use them to computes the mean values $t_t$ and $v$ over all the trajectories of the experiment.}.
     \begin{figure}[htp]
          \includegraphics[width=9.3cm,height=7cm]{./images/runtumble.png}
         \caption{This figure depicts the tracked trajectory of a single bacterium. Blue-yellow colors gradient shows the velocity. The red segments represent the identifies tumbles.}
         \label{runtumbledetection}
     \end{figure}
 
-We found a mean swimming velocity of  \SI{18}{\micro\meter \per \second}, a mean run time (time spent swimming straight) of \SI{0.8}{\second} and a tumble time of \SI{0.18}{\second}. 
-All these values are in accordance with the results of \textit{Cisneros et al.} \cite{Cisneros:2011}.
+A mean swimming velocity of  \SI{18}{\micro\meter \per \second}, a mean run time (time spent swimming straight) of \SI{0.8}{\second} and a tumble time of \SI{0.18}{\second} were found. 
+All these values\footnote{These motility parameters were also calculated using the \textit{Mean Square Displacement} (\texttt{MSD}) in time (which for the sake of brevity is only outlined here) and considering the following relationship $MSD(t)=\frac{1}{2}\frac{v^2 t_R^2}{2t/t_R +e^{\frac{-2t}{t_R}-1}}$ \cite{Howse:2007} where $v$ is the swimming speed, $t_R$ is the timescale associated to rotational diffusion that is $t_R=2t_t$, it is possible to obtain $t_R $ and $v$ via fitting. $t_t$ and $v$ are then used to compute $D_b$.} are in accordance with the results of \textit{Cisneros et al.} \cite{Cisneros:2011}.
 
 \section{Conclusion}\label{conclusions}
 This premiliary work we presented a an cellular automata based framework for tracking centroid-bounding box represented particles. 
@@ -815,5 +842,4 @@ John Von Neumann. 1966. Theory of Self-Reproducing Automata. Arthur W. Burks (Ed
 %\enlargethispage{-5in}
 
 \end{document}
-
 
