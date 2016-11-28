@@ -9,6 +9,7 @@
 \usepackage{mdframed,framed}
 \usepackage{paralist}
 \usepackage{tikz}
+\usepackage{subfig}
 \newcommand*\circled[1]{\tikz[baseline=(char.base)]{
             \node[shape=circle,draw,inner sep=0.3pt] (char) {#1};}}
 \usetikzlibrary{positioning,chains,fit,shapes,calc}
@@ -301,8 +302,7 @@ King’s Buildings, EH9 3BF Edinburgh, UK}
 
 \begin{abstract}
 %\lipsum[1-1]
-Particle tracking plays an important role in numerous fields of science for the investigation of the movement of sub-micron particles, micro-spheres and molecules under microscopic observation.
-In this paper we present TraCCA, an algorithm for detecting and tracking particles based on geometrical difference evaluation and centroid displacement analysis to reconstruct the trajectories. 
+Particle tracking plays an important role in numerous fields of science; In this paper we present TraCCA, an algorithm for detecting and tracking particles based on geometrical difference evaluation and centroid displacement analysis to reconstruct the trajectories. 
 This method works for $n$-dimensional input data provided that particles are represented by at least a centroid space coordinate and a geometrical entity which describe their shape. 
 Since 2-D images are a common source of such data, we also present a framework for image-manipulation based on Extended Cellular Automata (XCA).
 We have applied and validated TraCCA in investigating the motility of \textit{B. subtilis.} injected in a microfluidic device using 4100 images taken at 100 frames per second. 
@@ -673,13 +673,8 @@ Among possible functions, a linear combination of the centroids displacement and
 D(c_i,c_j) = a \sqrt{(x_{c_i} - x_{c_j})^2 + (y_{c_i}-y_{c_j})^2} + b |S_i \cap S_j|
 \end{equation}
 where $S_i$ and $S_j$ are the sets of pixels within the boundaries of the bacteria's  bounding box. Best values of weights $a$ and $b$ were experimentally determined in being $0.6$ and $0.4$ respectively. 
-
 %REVIEW
 Parameters search is carried out by computing the confusion matrix for 5 randomly picked images and for different values of $a,b \in \{\frac{i}{20}\;|\;0\leq i \leq 20\}$. and then choosing the ones minimizing false negative and false positive and maximizing true false and true positive. 
-
-
-
-
 
 
 \subsection{Analysis and Validation}
@@ -712,39 +707,44 @@ These experimental values\footnote{These motility parameters were also calculate
 In this preliminary work, a cellular-automata based tracking framework composed by a tracking algorithm and a CA support model for image processing, is presented for reconstructing trajectories of particle-like objects. The paper reports the application to a real case study concerning the tracking of \textit{B. subtilis}, by evaluating  standard motility parameters (average swimming velocity, running and tumble times) in a microfluidic device. Results that were obtained during experimentation, proved that the TraCCA framework has correctly reconstructed bacterial trajectories. The tracking algorithm described in this work can also be effectively adopted in other fields as, for instance, crowd dynamics, provided that traceable elements can be described by means of a bounding box and a position.
 
 Due to the large number of particles often involved in such applications, a preliminary parallel GPGPU + MPI version of the framework is currently being developed which has provided promising results in terms of scalability and speed up, allowing much larger dataset to be analyzed. Eventually, it is worth to note that under the assumption of associativity of the \textit{assignment operator} $\lozenge$, the tracking algorithm could be implemented using the \textit{parallel reduction} design pattern.
-
-
-    \begin{figure}[h]
+    \begin{figure}
       \begin{center}
         \includegraphics[scale=0.5]{./images/result.png}
-        \caption{Final collective view of all the tracked bacteria tracjectories as obtained by processing all 4100 images of the case study dataset. For the sake of figure clarity, a random color is associated to each bacterium trajectory.}\label{fig:}
-        
+        \caption{Final collective view of all the tracked bacteria tracjectories as obtained by processing all 4100 images of the case study dataset. For the sake of figure clarity, a random color is associated to each bacterium trajectory.}
       \end{center}
     \end{figure}
 
 
-% if have a single appendix:
-%\appendix[Proof of the Zonklar Equations]
-% or
-%\appendix  % for no appendix heading
-% do not use \section anymore after \appendix, only \section*
-% is possibly needed
 
-% use appendices with more than one appendix
-% then use \section to start each appendix
-% you must declare a \section before using any
-% \subsection or using \label (\appendices by itself
-% starts a section numbered zero.)
-%
-
-
-%\appendices
-%\section{Images Filters}
-%\subsection{Contrast stretch}
-
-% use section* for acknowledgement
 \section*{Acknowledgment}
 The authors would like to thank Prof. Filippo Melascina from the Institute of BioEngineering of the University of Edinburgh (UK) who kindly gave access to the microscopy equipment.
+
+
+\begin{figure}
+\centering
+\vspace{-0.4cm}
+\setlength{\tabcolsep}{-0.02cm}
+\begin{tabular}{cccc}
+\subfloat{\includegraphics[width = 0.13\textwidth]{./images/1.png}} &
+\subfloat{\includegraphics[width = 0.13\textwidth]{./images/2.png}} &
+\subfloat {\includegraphics[width = 0.13\textwidth]{./images/3.png}} &
+\subfloat {\includegraphics[width = 0.13\textwidth]{./images/4.png}}\\
+\subfloat{\includegraphics[width = 0.13\textwidth]{./images/5.png}} &
+\subfloat {\includegraphics[width = 0.13\textwidth]{./images/6.png}} &
+\subfloat {\includegraphics[width = 0.13\textwidth]{./images/7.png}} &
+\subfloat {\includegraphics[width = 0.13\textwidth]{./images/8.png}}\\
+\subfloat{\includegraphics[width = 0.13\textwidth]{./images/9.png}} &
+\subfloat {\includegraphics[width = 0.13\textwidth]{./images/10.png}} &
+\subfloat {\includegraphics[width = 0.13\textwidth]{./images/11.png}} &
+\subfloat {\includegraphics[width = 0.13\textwidth]{./images/12.png}}\\
+\subfloat{\includegraphics[width = 0.13\textwidth]{./images/13.png}} &
+\subfloat {\includegraphics[width = 0.13\textwidth]{./images/14.png}} &
+\subfloat {\includegraphics[width = 0.13\textwidth]{./images/15.png}} &
+\subfloat {\includegraphics[width = 0.13\textwidth]{./images/16.png}}\\
+
+\end{tabular}
+\caption{Final collective view of all the tracked bacteria tracjectories as obtained by processing all 4100 images of the case study dataset. For the sake of figure clarity, a random color is associated to each bacterium trajectory.}
+\end{figure}
 
 
 % Can use something like this to put references on a page
