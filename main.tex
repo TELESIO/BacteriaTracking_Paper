@@ -7,7 +7,7 @@
 \usepackage[linesnumbered,ruled]{algorithm2e}
 \usepackage[noend]{algpseudocode}
 \usepackage{mdframed,framed}
-
+\usepackage{paralist}
 \usepackage{tikz}
 \newcommand*\circled[1]{\tikz[baseline=(char.base)]{
             \node[shape=circle,draw,inner sep=0.3pt] (char) {#1};}}
@@ -245,7 +245,7 @@
 %
 % paper title
 % can use linebreaks \\ within to get better formatting as desired
-\title{TraCCA -  A Complex Cellular Automata based Particle Tracking Framework }
+\title{A Tracking Algorithm for \\Particle-like Moving Objects}
 
 
 % author names and affiliations
@@ -261,8 +261,8 @@ Email: d.spataro@mat.unical.it}
 \IEEEauthorblockN{ Alice Mari}
 \IEEEauthorblockA{Institute for BioEngineering\\
 University of Edinburgh\\
-King’s Buildings, EH9 3BF Edinburgh, UK\\
-Email: alicemari45@gmail.com }
+King’s Buildings, EH9 3BF Edinburgh, UK}
+%Email: alicemari45@gmail.com }
 }
 % conference papers do not typically use \thanks and this command
 % is locked out in conference mode. If really needed, such as for
@@ -301,12 +301,12 @@ Email: alicemari45@gmail.com }
 
 \begin{abstract}
 %\lipsum[1-1]
-Particle tracking plays an important role in numerous fields of science for the investigation of the movement of sub-micron particles, micropsheres and molecules under microscopic observation.
-In this paper we present an algorithm for detecting and tracking particles based on geometrical difference evaluation and centroid displacement analysis to reconstruct the trajectories. 
+Particle tracking plays an important role in numerous fields of science for the investigation of the movement of sub-micron particles, micro-spheres and molecules under microscopic observation.
+In this paper we present TraCCA, an algorithm for detecting and tracking particles based on geometrical difference evaluation and centroid displacement analysis to reconstruct the trajectories. 
 This method works for $n$-dimensional input data provided that particles are represented by at least a centroid space coordinate and a geometrical entity which describe their shape. 
 Since 2-D images are a common source of such data, we also present a framework for image-manipulation based on Extended Cellular Automata (XCA).
 We have applied and validated TraCCA in investigating the motility of \textit{B. subtilis.} injected in a microfluidic device using 4100 images taken at 100 frames per second. 
-Results show that the framework is able to reconstruct the trajectories as computed motion parameters that are in accordance with the ones found in literature. Eventually, a preliminary parallel version implemented on GPUs and distributed memory machines have produced promising scalability and speedup, proving that the methodology can be also applied for large datasets.  
+Results show that the framework is able to reconstruct the trajectories as computed motion parameters  are in accordance with the ones reported in the literature.   
 
 
 \end{abstract}
@@ -332,11 +332,10 @@ cellular automata, tracking, image processing, bacteria motility
 \IEEEpeerreviewmaketitle
 
 \section{Introduction}
-Studying of the movement of sub-micron particles, micro-spheres and molecules under microscopic observation often requires their time trajectories from which important kinematic and dynamic properties can be computed. 
+Studying the movement of sub-micron particles, micro-spheres and molecules under microscopic observation often requires their time trajectories from which important kinematic and dynamic properties can be computed. 
 Several studies employ time-lapse microscopy, especially in the field of biophysics, as a tool to gather data and retrieve single particle time trajectories. The researcher usually relies on manual or semi-manual/interactive software to study such properties. However, this approach is unfeasible when the number of cells involved in the analysis is high.
 
-In this paper we present an algorithm for detecting and tracking particles that is based on image processing techniques and to shape difference and centroid displacement analysis to reconstruct the trajectories. 
-This method works for $n$-dimensional input data provided that particles are represented by at least a centroid space coordinate and a geometrical entity which describe its shape. 
+In this paper we present an original algorithm for detecting and tracking particles that is based on image processing techniques and to shape difference and centroid displacement analysis to reconstruct the trajectories. To our knowledge this is the first study regarding semi-automatic detection of particles-like objects adopting parallel CA. In particular, the method works for $n$-dimensional input data provided that particles are represented by at least a centroid space coordinate and a geometrical entity which describe its shape. 
 Since $2$D images are a common source of such data we also present framework for image-manipulation based on the Extended Cellular Automata(XCA) paradigm .
 
 TraCCA has been successfully applied for the investigation of the motility of \textit{B. subtilis.} injected in a micro-fluidic device using 4100 images taken at 100 frames per second, as reported in Section \ref{sect:bacteriaanalysis}.
@@ -347,7 +346,7 @@ The paper is organized as follows: Sections  \ref{trackalgorithm} and \ref{manip
 
 \section{Tracking Algorithm}\label{trackalgorithm}
 The objective of the tracking algorithm is to produce a 
-set $ T_n = \{ t_i \}$  s.t.  $t_i=\{ c^i_k,c^i_{k+1},\ldots,c^i_l \} $ 
+set $ T_n = \{ t_i \}$, where $t_i=\{ c^i_k,c^i_{k+1},\ldots,c^i_l \} $ 
 of trajectories each described as a time-ordered list of positions in space from a set of input 
 particles $P=P_1 \cup P_2 \cup \ldots \cup P_n$ and a function $\mathcal{D} :  P \times P \mapsto \mathbb{R}$, 
 the \textit{distance} function. $P_i = \{p^j_i \; | \; 1 \leq j\; \}$ indicates all particles at time $i$ and each particle $p_i^j$ is defined by a centroid position, and a bounding box which describes its geometrical properties.
@@ -440,7 +439,7 @@ The pseudo-code reported in Algorithm \ref{matching} shows how the matching proc
 			 {$T_i+1.push(<p>)$}
 		}{
 			{
-			$FIND\_TRAJ(T_{i+1},match[p]).enqueue(p)$}\;
+			$MATCH(T_{i+1},match[p]).enqueue(p))$}\;
 		
 			}
 		}
@@ -455,7 +454,7 @@ The pseudo-code reported in Algorithm \ref{matching} shows how the matching proc
     
       
  
-    \caption{ssdsdsvc}
+    \caption{TraCCA tracking procedure}
 		\label{matching}
 \end{algorithm}
 
@@ -485,7 +484,7 @@ The pseudo-code reported in Algorithm \ref{matching} shows how the matching proc
 \node[fsnode,on chain] (fl)  {$p^{i}_l$};
 \node[below of=fl,node distance=10,yshift=-10] {$\vdots$};
 
-\node[fsnode,on chain] (f3) {$n$};
+\node[fsnode,on chain] (f3) {$p_n^i$};
 \end{scope}
 
 % the vertices of Frame1
@@ -528,9 +527,6 @@ The pseudo-code reported in Algorithm \ref{matching} shows how the matching proc
 	\foreach \j in {1,3,0}
 		\draw (f\i) edge  (s\j);
 		
-
-
-
    \end{scope}
 
 
@@ -545,7 +541,7 @@ Note that, for the sake clarity, arrows for the unmatched  nodes are omitted.} \
 
 
 \section{Manipulating images using XCA}\label{manipulating}
-In this section we present a Cellular Automata based framework for manipulating images that allows seamless parallel filters application.
+In this section we present a Cellular Automata (\cite{Ilachinski2001,Neumann1966}) based framework for manipulating images that allows seamless parallel filters application.
 \input{CA.tex}
 
 \subsection{Definition and Usage}
@@ -555,7 +551,7 @@ The XCA adopted for manipulating images is defined as a $7$-tuple $ IFCA = \lang
 
     \item $R$ is the $2$-dimensional cellular space.
 
-    \item $\Gamma \subseteq R$ is the region over the global operation are applied
+    \item $\Gamma \subseteq R$ is the region over where the global operation is applied
 
     \item $X=X(x_0,y_0)=\{(x,y): \left| x-x_0\right| \leq r \wedge \left| y-y_0\right| \leq r\} $ defines the \textit{Moore}'s neighborhood relationship of radius $r$
 
@@ -571,8 +567,8 @@ The XCA adopted for manipulating images is defined as a $7$-tuple $ IFCA = \lang
 
     \end{itemize}
     
-In order to take advantage of the intrinsic parallel nature of CA, \texttt{IFCA} is implemented augmenting an existing CA library, \texttt{\textbf{OpenCAL}} \cite{opencalurl} \cite{opencalmanual} which is empowered  with a set of procedures that allows seamless input/output and image convolution.
-More specifically each image is represented as an cellular automaton whose substates represent the color of the pixel and filters implemented as elementary processes composition (see listing \ref{list:imgman}).
+In order to take advantage of the intrinsic parallel nature of CA, \texttt{IFCA} is implemented augmenting an existing CA library, \texttt{\textbf{OpenCAL}} \cite{opencalurl} \cite{opencalmother} which is empowered  with a set of procedures that allows seamless input/output and image convolution.
+More specifically each image is represented as an cellular automaton whose substates represent the color of the pixel and filters implemented as elementary processes composition (see listing \ref{list:imgman}). 
 
 \lstset{
 frame=single,
@@ -597,8 +593,9 @@ calrun->run();
 \end{lstlisting}
 
 \texttt{IFCA} is extensible as it allows the application of user-defined filters by only specifying the pixel transformation rules (or kernels in case of convolutional ones). 
-Filters are then executed by the \texttt{IFCA} engine which comes with two parallel (OpenMP and OpenCL)  and a serial implementations.
+Filters are then executed by the \texttt{IFCA} engine which comes with two parallel (\texttt{OpenMP} and \texttt{OpenCL})  and a serial implementations.
 The parallel execution is completely transparent and automatic and may be extremely useful in such cases where the size of the image is large or filters are particularly computationally demanding.
+
 
 
 
@@ -611,13 +608,13 @@ The parallel execution is completely transparent and automatic and may be extrem
     \begin{minipage}[l]{1.0\columnwidth}
         \centering
         \includegraphics[width=8.5cm]{./images/bacteriasmall}
-        \caption{Origianal frame. The bacteria are the small darker cluter. Light gray and white is noise and background.}\label{contrast}
+        \caption{Raw input image. Bacteria appears as darker gray clusters, while light gray halos and white areas represent noise and PDMS chromatic aberrations.}\label{contrast}
     \end{minipage}
     \hfill{}
     \begin{minipage}[r]{1.0\columnwidth}
         \centering
         \includegraphics[width=8.5cm]{./images/bacteriasmall_threshold}
-        \caption{This represents a segmented and inverted version of the image on the left. White cluster are bacteria.}\label{BBB}
+        \caption{Segmented and color inverted version of Figure \ref{contrast} as obtained by applying the filters (cf. Section \ref{Bacteriasegmentation}) using the IFCA model. White cluster of pixels represent bacteria.}\label{BBB}
     \end{minipage}
 \end{figure*}
 In this section we present an application of TraCCA to the analysis of motion of \textit{B. subtilis.}
@@ -639,6 +636,7 @@ Two  walls of \textit{PDMS} (\SI{200}{\micro\metre}) separate the central channe
 All images are $512 \times 512$ pixels and have been exported in $16$-bit grayscale \texttt{TIFF} image format.
 
 \subsection{Bacteria Segmentation}
+\label{Bacteriasegmentation}
 
 The \textit{B. subtilis} cells typically have a large range of motion patterns and the cell soma generally appears as a dark area surrounded with a white halo.
 Colors can be inverted and the cell may appear white when it  moves out of focus sufficiently (see Figure \ref{contrast}).
@@ -651,7 +649,7 @@ As a consequence, a drawback of using the threshold method is that, among all in
 This can easily lead to binary regions where pixels are not contiguous or to miss or include relevant or unwanted pixels respectively, with these effects getting worse as the noise increases.
 In the considered case, however, the threshold method works well because after the application of the \texttt{contrast stretch filter} the analysed images present high contrast between the background and cells soma (see Figure \ref{contrast}), since the filter stretches or scales the range of pixel values between an upper and lower limit.
 More specifically, color values that are above or below this range are saturated to the upper or lower limit values respectively, while values that lay in the interval are scaled according to the following formula: 
-\[{g(x,y) = \begin{cases} L_o & \mbox{if } f(x,y) < L_i \\  H_o & \mbox{if } f(x,y) < H_i\\ L_o + (f(x,y)-L_i)\frac{H_o-L_o}{H_i-L_i} & \mbox{if } L_i \leq f(x,y) \leq H_i\end{cases}}\] where  $[L_i,H_i]$ defines the interval in the original image which is linearly scaled into the interval $[L_o,H_o]$.
+\[{g(x,y) = \begin{cases} L_o & \mbox{if } f(x,y) < L_i \\  H_o & \mbox{if } f(x,y) > H_i\\ L_o + (f(x,y)-L_i)\frac{H_o-L_o}{H_i-L_i} & \mbox{if } L_i \leq f(x,y) \leq H_i\end{cases}}\] where  $[L_i,H_i]$ defines the interval in the original image which is linearly scaled into the interval $[L_o,H_o]$.
 
 Eventually, all the images go through a noise reduction stage which employs a combinations of \textit{gaussian}, \textit{laplacian} and \textit{blurring} filters \cite{Deng:1993}.
 It is worth to note that filters parameters are dataset dependent and the best set of values experimentally determined. 
@@ -659,12 +657,13 @@ It is worth to note that filters parameters are dataset dependent and the best s
 
 
 
+
 \subsection{Bacteria Tracking}
 
 Binary images are then used to extract the relevant information (shape and centroid) for each of the segmented bacteria.
-This is done by interpreting each image as a graph whose nodes are pixels and arc $(i,j)$ exists if pixels $i$ and $j$ are neighbors (according to \textit{Moore}'s relationship, see section \ref{sec:CA}).
+This is done by interpreting each image as a graph whose nodes are pixels and arc $(i,j)$ exists if pixels $i$ and $j$ are neighbours (according to \textit{Moore}'s relationship, see section \ref{sec:CA}).
 A bacterium corresponds to a connected component that can be easily individuated by using the DFS visiting algorithm.
-Once all pixels that make up the cell soma are individuated, a unique \textit{ID} $id_i$ which identifies the bacterium uniquely, a centroid $c_i$ and a bounding box $s_i$ which describe describes the location, the shape and the area, respectively, are computed for each bacterium $i$. All the bacteria whose extension is less than $M_e = 2$\textit{px} are ignored and no further considered.
+Once all pixels that make up the cell soma are individuated, a unique \textit{ID} $id_i$ which identifies the bacterium uniquely, a centroid $c_i$ and a bounding box $s_i$ which describe the location, the shape and the area, respectively, are computed for each bacterium $i$. All the bacteria whose extension is less than $M_e = 2$\textit{px} are ignored and no further considered.
 The creation and manipulation of all the geometrical entities involved in this latter phase are carried out by means of the computational geometry library \texttt{CGAL}  \cite{CGAL}.
 
 In order for the application of the algorithm described in Section \ref{trackalgorithm}, a distance function is required.
@@ -673,38 +672,52 @@ Among possible functions, a linear combination of the centroids displacement and
 \label{sec:bacttracking}
 D(c_i,c_j) = a \sqrt{(x_{c_i} - x_{c_j})^2 + (y_{c_i}-y_{c_j})^2} + b |S_i \cap S_j|
 \end{equation}
-where $S_i$ and $S_j$ are the sets of pixels within the boundaries of the bacteria's  bounding box. Best values of weights $a$ and $b$ were experimentally determined in being $0.6$ and $0.4$ respectively.
+where $S_i$ and $S_j$ are the sets of pixels within the boundaries of the bacteria's  bounding box. Best values of weights $a$ and $b$ were experimentally determined in being $0.6$ and $0.4$ respectively. 
+
+%REVIEW
+Parameters search is carried out by computing the confusion matrix for 5 randomly picked images and for different values of $a,b \in \{\frac{i}{20}\;|\;0\leq i \leq 20\}$. and then choosing the ones minimizing false negative and false positive and maximizing true false and true positive. 
 
 
 
 
 
 
-\section{Analysis and Validation}
+\subsection{Analysis and Validation}
 Starting from the relationship $D_b=  \frac{v^2 t_t}{2}$  \cite{Berg:1993} that links the diffusion coefficient to both swim velocity ($v$) and tumbling time ($tt$), 
 we have partitioned each trajectory into running and tumbling events. 
 These events allow the swimming speed to be calculated as difference between subsequent bacteria positions and average tumbling time as the overall time spent tumbling over by the number of tumbling events. 
-Inspired by the work of \textit{Wong-Ng et al.} \cite{Wong2016} and \textit{B. Masson et al.} \cite{Masson:2011} an algorithm, implemented in \textit{MATLAB}, was adopted for detecting such running/tumbling events (see Figure \ref{runtumbledetection})  which in turn were used to extract all the relevant bacterial motility parameter from the tracked trajectories\footnote{Tumbles are associated to a decrease in advancing velocity and an abrupt change in the angular velocity (i.e. in the direction of the motion). Fixing a threshold on both advancing and angular velocities it is possible to identify running/tumbling and use them to computes the mean values $t_t$ and $v$ over all the trajectories of the experiment.}.
+Inspired by the work of \textit{Wong-Ng et al.} \cite{Wong2016} and \textit{B. Masson et al.} \cite{Masson:2011} an algorithm, implemented in \textit{MATLAB}, was adopted for detecting such running/tumbling events (see Figure \ref{runtumbledetection})  which in turn were used to extract all the relevant bacterial motility parameters from the tracked trajectories\footnote{Tumbles are associated both to a decrease in advancing velocity and an abrupt change in the angular velocity (i.e. in the direction of the motion). By fixing a threshold on both advancing and angular velocities it is possible to identify running/tumbling and use them to compute the mean values $t_t$ and $v$ over all the trajectories of the experiment.}.
+%REVIEW
     \begin{figure}[htp]
          \includegraphics[width=9.3cm,height=7cm]{./images/runtumble.png}
-        \caption{This figure depicts the tracked trajectory of a single bacterium. Blue-yellow colors gradient shows the velocity. The red segments represent the identifies tumbles.}
+        \caption{An example of tracked trajectory of a single bacterium. Blue-yellow colors levels are proportional to the velocity, while dark red segments represent the individuated tumbles.}
         \label{runtumbledetection}
     \end{figure}
 
-A mean swimming velocity of  \SI{18}{\micro\meter \per \second}, a mean run time (time spent swimming straight) of \SI{0.8}{\second} and a tumble time of \SI{0.18}{\second} were found. 
-All these values\footnote{These motility parameters were also calculated using the \textit{Mean Square Displacement} (\texttt{MSD}) in time (which for the sake of brevity is only outlined here) and considering the following relationship $MSD(t)=\frac{1}{2}\frac{v^2 t_R^2}{2t/t_R +e^{\frac{-2t}{t_R}-1}}$ \cite{Howse:2007} where $v$ is the swimming speed, $t_R$ is the timescale associated to rotational diffusion that is $t_R=2t_t$, it is possible to obtain $t_R $ and $v$ via fitting. $t_t$ and $v$ are then used to compute $D_b$.} are in accordance with the results of \textit{Cisneros et al.} \cite{Cisneros:2011}.
+The main parameters that were considered as as descriptors of the motion of the bacteria were: 
+\begin{inparadesc}
+\item[Mean Swimming Velocity] ($\overline{v}$),
+\item[Mean Run Time] ($\overline{r_t}$) and 
+\item[Tumble Time] ($\overline{t_t}$).
+\end{inparadesc}
+By analyzing the entire trajectory set produced by TraCCA on the dataset described in Section \ref{sec:bacttracking}, the obtained values of the motion descriptors  were the following: \begin{inparadesc}
+\item[$\overline{v}$] =\SI{18}{\micro\meter \per \second},
+\item[$\overline{rt}$] = \SI{0.8}{\second}
+\item[$\overline{t_t}$]= \SI{0.18}{\second}.
+\end{inparadesc}
+These experimental values\footnote{These motility parameters were also calculated using the \textit{Mean Square Displacement} (\texttt{MSD}) in time (which for the sake of brevity is only outlined here) by means of the MATLAB \texttt{@msdanalyzer} implementation \cite{msdanalyzer} and considering the following relationship $MSD(t)=\frac{1}{2}\frac{v^2 t_R^2}{2t/t_R +e^{\frac{-2t}{t_R}-1}}$ \cite{Howse2007} where $v$ is the swimming speed, $t_R$ is the timescale associated to rotational diffusion that is $t_R=2t_t$, it is possible to obtain $t_R $ and $v$ via fitting. $t_t$ and $v$ are then used to compute $D_b$.} are in accordance with those available in the literature as for instance in the work of \textit{Cisneros et al.} \cite{Cisneros:2011}.
+
 
 \section{Conclusion}\label{conclusions}
-This premiliary work we presented a an cellular automata based framework for tracking centroid-bounding box represented particles. 
-We also presented an application of the proposed framework on tracking the motion of \textit{B. subtilis} in a microfliudic device in order to retrieve the average swimming velocity, running and tumble times. The results are in accordance with \cite{Cisneros:2011}. 
-\subsection{Future works}
-Due to the possible large number of particles and frames involved in such analysis a parallel GPGPU+MPI version of the framework is being developed and it will be applied to the analisys of a much larger dataset to test its scalability and speedup.
-It is also important to note that under the assumption of associativity of the \textit{assignment operator} $\lozenge$ the tracking algorithm could be implemented using the design pattern of \textit{parallel reduction}.
+In this preliminary work, a cellular-automata based tracking framework composed by a tracking algorithm and a CA support model for image processing, is presented for reconstructing trajectories of particle-like objects. The paper reports the application to a real case study concerning the tracking of \textit{B. subtilis}, by evaluating  standard motility parameters (average swimming velocity, running and tumble times) in a microfluidic device. Results that were obtained during experimentation, proved that the TraCCA framework has correctly reconstructed bacterial trajectories. The tracking algorithm described in this work can also be effectively adopted in other fields as, for instance, crowd dynamics, provided that traceable elements can be described by means of a bounding box and a position.
+
+Due to the large number of particles often involved in such applications, a preliminary parallel GPGPU + MPI version of the framework is currently being developed which has provided promising results in terms of scalability and speed up, allowing much larger dataset to be analyzed. Eventually, it is worth to note that under the assumption of associativity of the \textit{assignment operator} $\lozenge$, the tracking algorithm could be implemented using the \textit{parallel reduction} design pattern.
+
 
     \begin{figure}[h]
       \begin{center}
         \includegraphics[scale=0.5]{./images/result.png}
-        \caption{This figures shows the collective view of all the tracked bacteria tracjectories. A random color is associated to each trajectory.}\label{fig:}
+        \caption{Final collective view of all the tracked bacteria tracjectories as obtained by processing all 4100 images of the case study dataset. For the sake of figure clarity, a random color is associated to each bacterium trajectory.}\label{fig:}
         
       \end{center}
     \end{figure}
@@ -731,7 +744,7 @@ It is also important to note that under the assumption of associativity of the \
 
 % use section* for acknowledgement
 \section*{Acknowledgment}
-The authors would like to thank NVIDIA for providing GPUs and Prof. Filippo Melascina from the University of Edinburgh, Institute of BioEngineering, UK who kindly gave access to the microscopy equipment.
+The authors would like to thank Prof. Filippo Melascina from the Institute of BioEngineering of the University of Edinburgh (UK) who kindly gave access to the microscopy equipment.
 
 
 % Can use something like this to put references on a page
@@ -766,6 +779,9 @@ The authors would like to thank NVIDIA for providing GPUs and Prof. Filippo Mela
 % (used to reserve space for the reference number labels box)
 \begin{thebibliography}{1}
 
+\bibitem{Berg:1993}
+Berg, Howard C. Random walks in biology. Princeton University Press, 1993.
+
 \bibitem{Cho:1989}
 S. Cho, R. Haralick, and S. Yi, ``Improvement of Kittler and Illingworth’s minimum error thresholding,'' Pattern Recognit., vol. 22, no. 5, pp. 609– 617, 1989.
 \bibitem{Shapiro:2002}
@@ -784,14 +800,12 @@ Bellman, R. E. Review: Eugene L. Lawler, Combinatorial optimization: networks an
 
 \bibitem{opencalurl}
 OPENCAL download page: \url{https://github.com/OpenCALTeam/opencal/releases}
-\bibitem{opencalmanual}
-OPENCAL download page: \url{https://github.com/OpenCALTeam/opencal-user-guide}
+\bibitem{opencalmother}
+D. D'Ambrosio, A. De Rango, M. Oliverio, D. Spataro, W. Spataro, R. Rongo, G. Mendicino, A. Senatore. The Open Computing Abstraction Layer for Extended Cellular Automata and Finite Differences Method. Submitted to the Journal of Parallel and Distributed Computing.
 
 \bibitem{msdanalyzer}
 Nadine Tarantino, Jean-Yves Tinevez, Elizabeth Faris Crowell, Bertrand Boisson, Ricardo Henriques, Musa Mhlanga, Fabrice Agou, Alain Israël, and Emmanuel Laplantine. TNF and IL-1 exhibit distinct ubiquitin requirements for inducing NEMO-IKK supramolecular structures. J Cell Biol (2014) vol. 204 (2) pp. 231-45
 
-\bibitem{msdanalyzer:web}
-\url{http://tinevez.github.io/msdanalyzer/}
 
 \bibitem{Wong2016}
 Wong-Ng J, Melbinger A, Celani A, Vergassola M (2016) The Role of Adaptation in Bacterial Speed Races. PLoS Comput Biol 12(6): e1004974. doi: 10.1371/journal.pcbi.1004974
@@ -811,6 +825,12 @@ Spataro, Davide, et al. "The new SCIARA-fv3 numerical model and acceleration by 
 
 \bibitem{Neumann1966}
 John Von Neumann. 1966. Theory of Self-Reproducing Automata. Arthur W. Burks (Ed.). University of Illinois Press, Champaign, IL, USA
+
+\bibitem{Howse2007}
+Jonathan R. Howse, Richard A. L. Jones, Anthony J. Ryan, Tim Gough, Reza Vafabakhsh, and Ramin Golestanian. Self-Motile Colloidal Particles: From Directed Propulsion to Random Walk. Phys. Rev. Lett. 99, 048102
+\bibitem{Ilachinski2001}
+Ilachinski, Andrew, 2001, Cellular Automata, A Discrete Universe, World Scientific,
+Singapore
 
 \end{thebibliography}
 
