@@ -66,13 +66,131 @@ March 5-8, 2017}
 \titlepage
 \end{frame}
 
-\begin{frame}{Synopsis}
-
-\end{frame}
 
 \begin{frame}{Contents}
 \tableofcontents
 \end{frame}
 
+
 \section{Introduction}
+%Frame----------------------------------------------------------------------------------------------------------------------------------------------------
+	\begin{frame}{Motivations}
+				\begin{itemize}
+					\item How bacteria react to a stimulus
+					\item How a drug interfere with bacteria, changing their chemiotaxis i.e. change in movements
+					\item For example monitoring how good is a drug impeding communication between cancer cells.
+				\end{itemize}
+				
+
+
+	\end{frame}
+	
+	%Frame----------------------------------------------------------------------------------------------------------------------------------------------------
+		\begin{frame}{Motivations}
+				\begin{figure}
+					\centering
+					\includegraphics[scale=0.38]{./images/motivations.png}
+				\end{figure}
+
+				\begin{itemize}
+					\item A: \textit{Normal} trajectories
+					\item B: Drug is administred
+					\item C: Red trajectories are of those who were affected by the drug
+				\end{itemize}
+				\textbf{Tracking allows  quantitatively analysis}!
+	\end{frame}
+	
+%Frame----------------------------------------------------------------------------------------------------------------------------------------------------
+		\begin{frame}{Motivations}
+				\begin{figure}
+					\centering
+					\includegraphics[scale=0.30]{./images/motivations2.png}
+				\end{figure}
+
+				\begin{itemize}
+					spiega che è sta cosa
+				\end{itemize}
+
+	\end{frame}
+	
+	
+	%Frame----------------------------------------------------------------------------------------------------------------------------------------------------
+		\begin{frame}{Motivations}
+				\begin{figure}
+					\centering
+					\includegraphics[scale=0.30]{./images/motivations3.png}
+				\end{figure}
+
+				\begin{itemize}
+				alga che muore e rilascia i nutrienti de quei cosi piccoli sono i batteri che si muovo per magnare
+				\end{itemize}
+
+	\end{frame}
+	
+	
+
+\section{Tracking Algorithm}
+
+	\subsection{Image Processing Using XCA}
+%Frame----------------------------------------------------------------------------------------------------------------------------------------------------
+		\begin{frame}{XCA - IFCA Engine }
+			CA in generale			
+		\end{frame}
+		%Frame----------------------------------------------------------------------------------------------------------------------------------------------------
+		\begin{frame}{XCA - IFCA Engine}
+			\begin{itemize}
+			\item Implemented on top of \textbf{OpenCAL}
+			\item Each color channels is represented as a substate
+			\item Local and Global Pixel transformations maps directly to \textit{elementary processes} and \textit{global operations}, respectively.
+			\item Runs on a number of parallel architectures and accelerators
+			\item Easy to use. Threshold Filter in ~$20$ LoC.
+			\item Seamless input/output
+			\end{itemize}
+		\end{frame}
+		%Frame----------------------------------------------------------------------------------------------------------------------------------------------------
+		\begin{frame}{XCA - IFCA Engine}
+			
+		\end{frame}		
+		
+	%Frame----------------------------------------------------------------------------------------------------------------------------------------------------	
+		\begin{frame}{IFCA Engine - Convolutional Operators}
+			
+		\end{frame}
+%Frame----------------------------------------------------------------------------------------------------------------------------------------------------
+		\begin{frame}{IFCA Engine - Example: $N-$Dimensional Laplacian Filter}
+			
+		\end{frame}	
+		
+	\subsection{Trajectories Reconstruction}	
+%Frame----------------------------------------------------------------------------------------------------------------------------------------------------	
+		\begin{frame}{Objective}
+			\begin{block}{Algorithm}
+				From a set of particle representations construct a set of trajectories over time.
+			\end{block}
+			
+		\end{frame}
+	%Frame----------------------------------------------------------------------------------------------------------------------------------------------------	
+	
+
+
+\section{Test Case: Motility of B. Subtilis}
+%Frame----------------------------------------------------------------------------------------------------------------------------------------------------
+	\begin{frame}{Experiment Setting}
+
+	\end{frame}
+%Frame----------------------------------------------------------------------------------------------------------------------------------------------------
+	\begin{frame}{How Bacteria Moves?}
+
+	\end{frame}
+%Frame----------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+\begin{frame}%%     2
+\begin{center}
+{\fontsize{40}{50}\selectfont Thank You!}
+\end{center}
+\end{frame}
+
 \end{document}
