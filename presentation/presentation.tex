@@ -79,6 +79,7 @@ March 5-8, 2017}
 					\item How bacteria react to a stimulus
 					\item How a drug interfere with bacteria, changing their chemiotaxis i.e. change in movements
 					\item For example monitoring how good is a drug impeding communication between cancer cells.
+					\item When the number of \textit{particles} is high, manual evaluation is \textbf{infisable}
 				\end{itemize}
 				
 
@@ -108,7 +109,7 @@ March 5-8, 2017}
 				\end{figure}
 
 				\begin{itemize}
-					spiega che è sta cosa
+					\item spiega che è sta cosa
 				\end{itemize}
 
 	\end{frame}
@@ -122,7 +123,7 @@ March 5-8, 2017}
 				\end{figure}
 
 				\begin{itemize}
-				alga che muore e rilascia i nutrienti de quei cosi piccoli sono i batteri che si muovo per magnare
+				\item alga che muore e rilascia i nutrienti de quei cosi piccoli sono i batteri che si muovo per magnare
 				\end{itemize}
 
 	\end{frame}
@@ -133,9 +134,39 @@ March 5-8, 2017}
 
 	\subsection{Image Processing Using XCA}
 %Frame----------------------------------------------------------------------------------------------------------------------------------------------------
-		\begin{frame}{XCA - IFCA Engine }
-			CA in generale			
+		\begin{frame}{XCA - IFCA Engine - CA}
+			\begin{itemize}
+			\item Cellular Automata (CA) are \textbf{Turing complete dunamical system} and also a \textbf{parallel computational models} (\textit{von Neumann 1966})
+			\item CA can be described as a matrix of simple processing units, the cells, each one interacting with its neighbouring ones
+
+			\end{itemize}
+					\begin{figure}
+					\centering
+					\includegraphics[scale=0.68]{./images/CA}
+				\end{figure}
 		\end{frame}
+%Frame----------------------------------------------------------------------------------------------------------------------------------------------------
+		\begin{frame}{XCA - IFCA Engine - CA}
+		\[
+			A = \Big<Z^d , Q, X, \tau \Big>		
+		\] where:
+		\begin{itemize}
+		 \item $Z^d$ is the $d-$dimensional Cellular Space.
+		 \item $Q$ is the \textbf{finite} set of states of the cell
+		 \item $X = \{\xi_0, \xi_1, \ldots , \xi_{m-1}\}$ is the finite set of $d-$dimensional vectors that define the set of coordinates of the neighbouring cells $V(X,i)=\{i+xi_0, i+\xi{1},\ldots, i+\xi{m-1}\}$
+
+		 \item $\tau: Q^m \mapsto  Q$ is the deterministic transition function for the cell. $tau$ is applied simultaneously to each cell, for each CA step
+		\end{itemize}
+		\end{frame}
+		
+%Frame----------------------------------------------------------------------------------------------------------------------------------------------------
+		\begin{frame}{XCA - IFCA Engine }
+		\begin{itemize}
+		\item A (farily large) number of Image Processing algorithm can be expressed as CA.
+		\item  Convolutional filters are a clear examples of this.
+		
+		\end{itemize}	
+		\end{frame}	
 		%Frame----------------------------------------------------------------------------------------------------------------------------------------------------
 		\begin{frame}{XCA - IFCA Engine}
 			\begin{itemize}
@@ -168,8 +199,22 @@ March 5-8, 2017}
 				From a set of particle representations construct a set of trajectories over time.
 			\end{block}
 			
+			
+			
 		\end{frame}
-	%Frame----------------------------------------------------------------------------------------------------------------------------------------------------	
+	%Frame----------------------------------------------------------------------------------------------------------------------------------------------------
+%Frame----------------------------------------------------------------------------------------------------------------------------------------------------	
+		\begin{frame}{Objective}
+	
+		\begin{figure}
+					\centering
+					\includegraphics[scale=0.18]{./images/graph.png}
+				\end{figure}
+			
+			
+			
+		\end{frame}
+
 	
 
 
