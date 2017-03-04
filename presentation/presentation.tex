@@ -12,7 +12,7 @@
 \usepackage{amsfonts}
 \usepackage{amsmath}
 \usepackage{mathtools}
-
+\usepackage{listing}
 \usepackage[scaled=.90]{helvet}
 \usepackage{courier}
 \usepackage{graphicx}
@@ -153,7 +153,7 @@ March 5-8, 2017}
 		\begin{itemize}
 		 \item $Z^d$ is the $d-$dimensional Cellular Space.
 		 \item $Q$ is the \textbf{finite} set of states of the cell
-		 \item $X = \{\xi_0, \xi_1, \ldots , \xi_{m-1}\}$ is the finite set of $d-$dimensional vectors that define the set of coordinates of the neighbouring cells $V(X,i)=\{i+xi_0, i+\xi{1},\ldots, i+\xi{m-1}\}$
+		 \item $X = \{\xi_0, \xi_1, \ldots , \xi_{m-1}\}$ is the finite set of $d-$dimensional vectors that define the set of coordinates of the neighbouring cells $V(X,i)=\{i+\xi_0, i+\xi{1},\ldots, i+\xi{m-1}\}$
 
 		 \item $\tau: Q^m \mapsto  Q$ is the deterministic transition function for the cell. $tau$ is applied simultaneously to each cell, for each CA step
 		\end{itemize}
@@ -161,15 +161,24 @@ March 5-8, 2017}
 		
 %Frame----------------------------------------------------------------------------------------------------------------------------------------------------
 		\begin{frame}{XCA - IFCA Engine }
-		\begin{itemize}
-		\item A (farily large) number of Image Processing algorithm can be expressed as CA.
-		\item  Convolutional filters are a clear examples of this.
+\begin{block}{A (farly large) number of Image Processing algorithm can be expressed as CA}
+Convolutional filters $\mapsto$ $X$ and $\tau$ in CA's world.
+
+\end{block}		
 		
-		\end{itemize}	
+		\begin{figure}
+					\centering
+					\includegraphics[scale=0.28]{./images/kernel_convolution}
+				\end{figure}
 		\end{frame}	
-		%Frame----------------------------------------------------------------------------------------------------------------------------------------------------
-		\begin{frame}{XCA - IFCA Engine}
-			\begin{itemize}
+
+%Frame----------------------------------------------------------------------------------------------------------------------------------------------------
+		\begin{frame}{XCA - IFCA Engine }
+\begin{block}{Use CA instead of normal IP tecniques to get parallelism transparently!}
+\end{block}		
+		
+
+		\begin{itemize}
 			\item Implemented on top of \textbf{OpenCAL}
 			\item Each color channels is represented as a substate
 			\item Local and Global Pixel transformations maps directly to \textit{elementary processes} and \textit{global operations}, respectively.
@@ -179,14 +188,36 @@ March 5-8, 2017}
 			\end{itemize}
 		\end{frame}
 		%Frame----------------------------------------------------------------------------------------------------------------------------------------------------
-		\begin{frame}{XCA - IFCA Engine}
+		\begin{frame}[fragile]{XCA - IFCA Engine}
+			 \begin{lstlisting}[language=C,basicstyle=\tiny\ttfamily]
+template<uint DIM, class NEIGH, typename CT, class PT>
+class ThresholdFilter : public opencal::CALLocalFunction< DIM , NEIGH , CT>{
+
+    TYPE lowT , highT ;
+    TYPE outRangeValue , inRangeValue;
+
+    ThresholdFilter(auto* sbs, TYPE _lowT , TYPE _highT , TYPE _outrange, TYPE _inrange ):
+        img(sbs), lowT(_lowT) , highT(_highT) , 
+        outRangeValue(_outrange) , inRangeValue(_inrange) { }
+    
+    void run(MODELTYPE* model,std::array<CT,DIM>& indices){
+        
+        constexpr int channels = std::tuple_size<PT>::value;
+        PIXELTYPE newVal=img->getElement(indices);
+
+        for (int i = 0; i<channels; ++i){
+            const TYPE output =  (newVal[i] >= lowT && newVal[i] <= highT) ?
+            					 inRangeValue : outRangeValue ;
+            newVal[i] = output;
+        }
+        img->setElement(indices,newVal);
+    }
+};			
 			
+	\end{lstlisting}
 		\end{frame}		
 		
-	%Frame----------------------------------------------------------------------------------------------------------------------------------------------------	
-		\begin{frame}{IFCA Engine - Convolutional Operators}
-			
-		\end{frame}
+	
 %Frame----------------------------------------------------------------------------------------------------------------------------------------------------
 		\begin{frame}{IFCA Engine - Example: $N-$Dimensional Laplacian Filter}
 			
